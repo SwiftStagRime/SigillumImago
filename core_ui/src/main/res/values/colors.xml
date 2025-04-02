@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="primary_light">#FFFFFF</color>
+    <color name="on_primary_light">#000000</color>
+    <color name="primary_container_light">#C2C6D0</color>
+    <color name="on_primary_container_light">#000000</color>
+
+    <color name="primary_dark">#1C1F23</color>
+    <color name="on_primary_dark">#FFFFFF</color>
+    <color name="primary_container_dark">#1B2931</color>
+    <color name="on_primary_container_dark">#FFFFFF</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="blue">#3B58F6</color>
+    <color name="red">#E62929</color>
+    <color name="green">#4CE752</color>
+
+    <color name="grey_light_subtle">#FFF0F0F0</color>
+    <color name="grey_light_medium">#FFE0E0E0</color>
+    <color name="grey_dark_subtle">#FF1F1F1F</color>
+    <color name="grey_dark_medium">#FF333333</color>
+    <color name="grey_outline">#FF79747E</color>
+
+    <color name="error_light">#B3261E</color>
+    <color name="on_error_light">#FFFFFF</color>
+    <color name="error_container_light">#F9DEDC</color>
+    <color name="on_error_container_light">#410E0B</color>
+
+    <color name="error_dark">#F2B8B5</color>
+    <color name="on_error_dark">#601410</color>
+    <color name="error_container_dark">#8C1D18</color>
+    <color name="on_error_container_dark">#F9DEDC</color>
+
+</resources>
+

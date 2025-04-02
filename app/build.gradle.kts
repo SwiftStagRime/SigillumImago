@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -9,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.swifstagrime.sigillumimago"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -39,6 +41,17 @@ android {
 }
 
 dependencies {
+    //Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+
+    //Project modules
+    implementation(project(":core_ui"))
+    implementation(project(":feature_auth"))
+    implementation(project(":feature_camera"))
+    implementation(project(":feature_gallery"))
+    implementation(project(":feature_settings"))
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

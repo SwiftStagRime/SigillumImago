@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cd_capture_photo">Capture Photo</string>
+    <string name="cd_switch_camera">Switch Camera</string>
+    <string name="cd_toggle_flash">Toggle Flash</string>
+    <string name="cd_open_gallery">Open Gallery</string>
+    <string name="camera_permission_denied_message">Camera permission is required. Please grant permission in app settings.</string>
+    <string name="camera_error_message">Camera Error: %1$s</string>
+    <string name="saving_photo">Saving photo…</string>
+    <string name="grant">Grant</string>
+    <string name="camera_permission_rationale">Camera access is needed to capture photos.</string>
+</resources>

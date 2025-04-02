@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Define the SAME base theme name, but inherit from DayNight parent again or directly customize -->
+    <style name="Theme.SigillumImago" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Map theme attributes to DARK theme colors -->
+        <item name="colorPrimary">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/on_primary_dark</item>
+        <item name="colorPrimaryContainer">@color/primary_container_dark</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary_container_dark</item>
+        <!-- ... other dark theme color mappings ... -->
+        <item name="android:colorBackground">@color/black</item> <!-- PURE BLACK Background -->
+        <item name="colorOnBackground">@color/white</item>
+        <item name="colorSurface">@color/black</item> <!-- PURE BLACK Surface -->
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorSurfaceVariant">@color/grey_dark_subtle</item>
+        <item name="colorOnSurfaceVariant">@color/white</item>
+        <item name="colorOutline">@color/grey_outline</item> <!-- Outline might stay the same or adjust -->
+        <item name="colorError">@color/error_dark</item>
+        <!-- ... etc for all dark theme colors -->
+
+        <!-- Common settings like shapes and component styles (can be redefined if needed, but often same) -->
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
+
