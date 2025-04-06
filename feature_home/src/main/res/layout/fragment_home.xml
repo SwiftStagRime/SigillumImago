@@ -4,20 +4,162 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/margin_medium"
     android:layout_marginStart="@dimen/margin_medium"
+    android:layout_marginTop="@dimen/margin_medium"
     android:layout_marginEnd="@dimen/margin_medium"
+    android:theme="@style/Theme.SigillumImago"
     tools:context=".ui.fragments.home.HomeFragment">
 
-    <Button
+    <ImageButton
+        android:id="@+id/settings_btn"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:background="@drawable/ic_settings"
+        android:src="@drawable/ic_settings"
+        app:tint="?attr/colorOnPrimary"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="fitCenter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width=""
-        android:layout_height=""
+
+    <TextView
+        android:id="@+id/welcome_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:lines="2"
+        android:layout_marginTop="40dp"
+        android:fontFamily="@font/robotics"
+        android:text="@string/welcome_sign"
+        android:textAllCaps="true"
+android:textColor="?attr/colorOnPrimary"
+        android:textSize="56sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/settings_btn" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/shortcut_box"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/welcome_text">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/camera_shortcut"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:cardCornerRadius="@dimen/card_corner_radius_medium"
+            app:cardElevation="5dp"
+            android:focusable="true"
+            android:clickable="true"
+            app:cardBackgroundColor="@color/modern_indigo"
+            app:layout_constraintDimensionRatio="2:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ic_camera"
+                    android:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/camera"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/audio_shortcut"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="5dp"
+            android:focusable="true"
+            android:clickable="true"
+            app:cardBackgroundColor="@color/modern_coral"
+            app:cardCornerRadius="@dimen/card_corner_radius_medium"
+            app:cardElevation="5dp"
+            app:layout_constraintEnd_toStartOf="@+id/docs_shortcut"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/camera_shortcut">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="12dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ic_audio"
+                    android:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recorder"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/docs_shortcut"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="8dp"
+            android:focusable="true"
+            android:clickable="true"
+            app:cardCornerRadius="@dimen/card_corner_radius_medium"
+            app:cardElevation="5dp"
+            app:cardBackgroundColor="@color/modern_teal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/audio_shortcut"
+            app:layout_constraintTop_toBottomOf="@id/camera_shortcut">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="12dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ic_documents"
+                    android:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/documents"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,4 +9,11 @@
     <string name="saving_photo">Saving photo…</string>
     <string name="grant">Grant</string>
     <string name="camera_permission_rationale">Camera access is needed to capture photos.</string>
+    <string name="camera">Camera</string>
+    <string name="recorder">Recorder</string>
+    <string name="documents">Document</string>
+    <string name="welcome_sign">Stay\nSecure!</string>
+    <string name="gallery_empty_message">No photos found.</string>
+    <string name="gallery_error_loading">Error loading gallery.</string>
+    <string name="cd_gallery_thumbnail">Media thumbnail</string>
 </resources>

@@ -1,31 +1,149 @@
 package com.swifstagrime.feature_home.ui.fragments.home
 
+import android.graphics.Color
+import android.net.Uri
 import androidx.fragment.app.viewModels
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.swifstagrime.core_ui.ui.fragments.BaseFragment
 import com.swifstagrime.feature_home.R
+import com.swifstagrime.feature_home.databinding.FragmentHomeBinding
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import androidx.core.net.toUri
+import androidx.core.view.doOnPreDraw
 
-class HomeFragment : Fragment() {
+class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
-    companion object {
-        fun newInstance() = HomeFragment()
-    }
+    override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentHomeBinding
+        get() = FragmentHomeBinding::inflate
 
     private val viewModel: HomeViewModel by viewModels()
+    private var typingAnimationJob: Job? = null
+    private val typingDelayMs = 120L
+    private var heightSet = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // TODO: Use the ViewModel
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (!viewModel.hasAnimationBeenPlayed.value) {
+            prepareWelcomeTextForAnimation()
+        }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.fragment_home, container, false)
+    override fun setupViews() {
+        binding.settingsBtn.setOnClickListener {
+            navigateToSettings()
+        }
+
+        binding.cameraShortcut.setOnClickListener {
+            navigateToCamera()
+        }
+
+        binding.audioShortcut.setOnClickListener {
+            navigateToAudioRecorder()
+        }
+
+        binding.docsShortcut.setOnClickListener {
+            navigateToDocuments()
+        }
+    }
+
+    private fun prepareWelcomeTextForAnimation() {
+        val welcomeTextView = binding.welcomeText
+        val finalFullText = getString(com.swifstagrime.core_ui.R.string.welcome_sign).replace(" ", "\n")
+        welcomeTextView.text = finalFullText
+        welcomeTextView.visibility = View.INVISIBLE
+        heightSet = false
+
+        welcomeTextView.doOnPreDraw {
+            if (!heightSet && it.height > 0 && it.width > 0) {
+                val measuredHeight = it.height
+
+                val params = it.layoutParams
+                params.height = measuredHeight
+                it.layoutParams = params
+                heightSet = true
+                it.visibility = View.VISIBLE
+                startWelcomeTextAnimation(finalFullText)
+            }
+        }
+    }
+
+    private fun startWelcomeTextAnimation(fullText: String) {
+        typingAnimationJob?.cancel()
+        val welcomeTextView = binding.welcomeText
+        val actualTextColor = welcomeTextView.currentTextColor
+        val spannable = SpannableStringBuilder(fullText)
+        spannable.setSpan(
+            ForegroundColorSpan(Color.TRANSPARENT),
+            0,
+            fullText.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        welcomeTextView.text = spannable
+
+        typingAnimationJob = viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                for (i in 0 until fullText.length) {
+                    val colorSpan = ForegroundColorSpan(actualTextColor)
+                    spannable.setSpan(
+                        colorSpan,
+                        0,
+                        i + 1,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    welcomeTextView.text = spannable
+                    delay(typingDelayMs)
+                }
+                setFinalTextState(fullText, actualTextColor)
+                viewModel.markAnimationAsPlayed()
+
+            } catch (e: Exception) {
+                setFinalTextState(fullText, actualTextColor)
+                viewModel.markAnimationAsPlayed()
+            }
+        }
+    }
+
+    private fun setFinalTextState(fullText: String, color: Int) {
+            val finalSpannable = SpannableStringBuilder(fullText)
+            finalSpannable.setSpan(
+                ForegroundColorSpan(color),
+                0,
+                fullText.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            binding.welcomeText.text = finalSpannable
+    }
+
+    private fun navigateToSettings() {
+        findNavController().navigate("sigillum://app/settings".toUri())
+    }
+
+    private fun navigateToCamera() {
+        findNavController().navigate("sigillum://app/camera".toUri())
+    }
+
+    private fun navigateToAudioRecorder() {
+        findNavController().navigate("sigillum://app/audio_recorder".toUri())
+    }
+
+    private fun navigateToDocuments() {
+        findNavController().navigate("sigillum://app/documents".toUri())
+    }
+
+
+    override fun onDestroyView() {
+        typingAnimationJob?.cancel()
+        super.onDestroyView()
     }
 }

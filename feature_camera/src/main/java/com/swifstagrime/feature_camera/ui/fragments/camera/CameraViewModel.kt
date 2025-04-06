@@ -67,15 +67,7 @@ class CameraViewModel @Inject constructor(
     private val _lensFacing = MutableStateFlow(LensFacing.BACK)
     val lensFacing: StateFlow<LensFacing> = _lensFacing.asStateFlow()
 
-    /** To be called by Fragment when it checks permissions */
     fun onPermissionCheckResult(hasCameraPermission: Boolean, hasStoragePermission: Boolean = true) {
-        // Note: WRITE_EXTERNAL_STORAGE might not be strictly needed for saving to app-specific
-        // directory post Android Q, but good practice to check if targeting older OS or
-        // if future features might need it. Let's assume needed for now for robustness.
-        // For API 23-29, storage permission IS needed. For API 30+, maybe not for app-specific dir.
-        // Simplifying: Require camera perm. Storage perm handled by repository if needed.
-        // UPDATE: For saving to app's internal storage (context.filesDir), no storage permission needed.
-
         if (hasCameraPermission) {
             _cameraInitState.value = CameraInitState.Initializing
         } else {

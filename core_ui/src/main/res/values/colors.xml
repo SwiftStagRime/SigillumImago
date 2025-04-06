@@ -13,9 +13,6 @@
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="blue">#3B58F6</color>
-    <color name="red">#E62929</color>
-    <color name="green">#4CE752</color>
 
     <color name="grey_light_subtle">#FFF0F0F0</color>
     <color name="grey_light_medium">#FFE0E0E0</color>
@@ -32,6 +29,26 @@
     <color name="on_error_dark">#601410</color>
     <color name="error_container_dark">#8C1D18</color>
     <color name="on_error_container_dark">#F9DEDC</color>
+
+    <color name="soft_green_start">#65D869</color> <!-- Slightly less intense green -->
+    <color name="soft_green_end">#4ECB52</color>   <!-- Slightly darker for depth -->
+    <color name="soft_red_start">#F86565</color>     <!-- Softer, slightly pinkish red -->
+    <color name="soft_red_end">#E84A4A</color>       <!-- Darker version -->
+    <color name="soft_blue_start">#5F7DF8</color>    <!-- Softer blue -->
+    <color name="soft_blue_end">#4969E8</color>      <!-- Darker version -->
+
+    <!-- Solid versions (optional, if needed elsewhere) -->
+    <color name="soft_green">#5AD05E</color>
+    <color name="soft_red">#F05555</color>
+    <color name="soft_blue">#5271F0</color>
+
+    <color name="modern_teal">#36BBA5</color>
+    <color name="modern_coral">#FF7070</color>
+    <color name="modern_indigo">#6B6CF5</color>
+
+    <color name="subtle_green">#70B073</color>
+    <color name="subtle_red">#C96262</color>
+    <color name="subtle_blue">#627DA9</color>
 
 </resources>
 

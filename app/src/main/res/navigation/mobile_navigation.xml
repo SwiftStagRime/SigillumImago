@@ -3,10 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/navigation_camera">
+    app:startDestination="@id/navigation_home">
     <fragment
         android:id="@+id/navigation_camera"
         android:name="com.swifstagrime.feature_camera.ui.fragments.camera.CameraFragment"
     android:label="Camera"
-    tools:layout="@layout/fragment_camera" />
+    tools:layout="@layout/fragment_camera">
+        <deepLink app:uri="sigillum://app/camera" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_gallery"
+        android:name="com.swifstagrime.feature_gallery.ui.fragments.GalleryFragment"
+        android:label="GalleryFragment"
+        tools:layout="@layout/fragment_gallery">
+        <deepLink app:uri="sigillum://app/gallery" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.swifstagrime.feature_home.ui.fragments.home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home">
+        <deepLink app:uri="sigillum://app/home" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.swifstagrime.feature_settings.ui.fragments.settings.SettingsFragment"
+        android:label="SettingsFragment"
+        tools:layout="@layout/fragment_settings">
+        <deepLink app:uri="sigillum://app/settings" />
+    </fragment>
 </navigation>

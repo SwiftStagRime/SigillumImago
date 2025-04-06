@@ -30,6 +30,12 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import android.Manifest
+import android.annotation.SuppressLint
+import android.view.MotionEvent
+import androidx.camera.core.Camera
+import androidx.camera.core.CameraInfoUnavailableException
+import androidx.camera.core.FocusMeteringAction
+import androidx.camera.view.PreviewView
 
 @AndroidEntryPoint
 class CameraFragment : BaseFragment<FragmentCameraBinding>() {
@@ -45,6 +51,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private var currentLensFacing: LensFacing = LensFacing.BACK
     private var currentFlashMode: FlashMode = FlashMode.OFF
+    private var camera: Camera? = null
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -69,21 +76,48 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
     override fun onDestroyView() {
         super.onDestroyView()
         cameraExecutor.shutdown()
+        camera = null
+        cameraProvider = null
+        imageCapture = null
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun setupViews() {
-        binding.captureButton.setOnClickListener {
-            viewModel.onTakePhotoClicked()
-        }
-        binding.switchCameraButton.setOnClickListener {
-            viewModel.onSwitchCameraClicked()
-        }
-        binding.flashButton.setOnClickListener {
-            viewModel.onFlashButtonClicked()
-        }
-        binding.galleryButton.setOnClickListener {
-            showSnackbar("Gallery feature not yet implemented.")
+        // --- Button Listeners ---
+        binding.captureButton.setOnClickListener { viewModel.onTakePhotoClicked() }
+        binding.switchCameraButton.setOnClickListener { viewModel.onSwitchCameraClicked() }
+        binding.flashButton.setOnClickListener { viewModel.onFlashButtonClicked() }
+        binding.galleryButton.setOnClickListener { showSnackbar("Gallery feature not yet implemented.") }
+
+        // --- Tap-to-Focus Listener ---
+        binding.previewView.setOnTouchListener { view, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> return@setOnTouchListener true // Consume ACTION_DOWN
+                MotionEvent.ACTION_UP -> {
+                    // Get the MeteringPointFactory from PreviewView
+                    val factory = (view as PreviewView).meteringPointFactory
+
+                    // Create a MeteringPoint from the tap coordinates
+                    val point = factory.createPoint(motionEvent.x, motionEvent.y)
+
+                    // Create a FocusMeteringAction configuration
+                    val action = FocusMeteringAction.Builder(point)
+                        // Optionally auto-cancel after a timeout
+                        // .setAutoCancelDuration(5, TimeUnit.SECONDS)
+                        // Focus and Exposure (AF/AE)
+                        .addPoint(point, FocusMeteringAction.FLAG_AF or FocusMeteringAction.FLAG_AE)
+                        .build()
+
+                    // Trigger focus and metering based on the action
+                    startFocusAndMetering(action)
+
+                    // Optionally call performClick for accessibility if just using ACTION_UP
+                    // view.performClick()
+                    return@setOnTouchListener true // Consume ACTION_UP
+                }
+                else -> return@setOnTouchListener false // Ignore other actions
+            }
         }
     }
 
@@ -119,17 +153,18 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                         Log.d(Constants.APP_TAG, "FlashMode changed: $mode")
                         currentFlashMode = mode
                         updateFlashButtonIcon(mode)
+                        camera?.cameraControl?.enableTorch(mode == FlashMode.ON)
                         imageCapture?.flashMode = mode.imageCaptureMode
                     }
                 }
 
                 launch {
                     viewModel.lensFacing.collect { facing ->
-                        Log.d(Constants.APP_TAG, "LensFacing changed: $facing")
-                        if (currentLensFacing != facing) {
+                        if (currentLensFacing != facing || camera == null) {
                             currentLensFacing = facing
                             if(viewModel.cameraInitState.value == CameraInitState.Initializing ||
-                                viewModel.cameraInitState.value == CameraInitState.Ready) {
+                                viewModel.cameraInitState.value == CameraInitState.Ready ||
+                                viewModel.cameraInitState.value == CameraInitState.NeedsPermission) {
                                 startCamera()
                             }
                         }
@@ -149,32 +184,46 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                 .build()
             val preview = Preview.Builder()
                 .build()
-                .also {
-                    it.setSurfaceProvider(binding.previewView.surfaceProvider)
-                }
+                .also { it.setSurfaceProvider(binding.previewView.surfaceProvider) }
+
             imageCapture = ImageCapture.Builder()
                 .setFlashMode(currentFlashMode.imageCaptureMode)
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                 .build()
 
             try {
                 cameraProvider?.unbindAll()
-                cameraProvider?.bindToLifecycle(
+
+                camera = cameraProvider?.bindToLifecycle(
                     viewLifecycleOwner,
                     cameraSelector,
                     preview,
                     imageCapture
                 )
-                Log.d(Constants.APP_TAG, "CameraX Use cases bound successfully.")
+
+                val hasFlash = camera?.cameraInfo?.hasFlashUnit() == true
+                if (!hasFlash) {
+                    binding.flashButton.visibility = View.GONE
+                } else {
+                    binding.flashButton.visibility = View.VISIBLE
+                    updateFlashButtonIcon(viewModel.flashMode.value)
+                }
                 viewModel.onCameraReady()
 
             } catch (exc: Exception) {
-                Log.e(Constants.APP_TAG, "Use case binding failed", exc)
                 viewModel.onCameraSetupError(exc)
             }
 
         }, ContextCompat.getMainExecutor(requireContext()))
     }
+
+    private fun startFocusAndMetering(action: FocusMeteringAction) {
+        val cameraControl = camera?.cameraControl ?: run {
+            return
+        }
+        cameraControl.startFocusAndMetering(action)
+    }
+
 
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
@@ -183,7 +232,6 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
             ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
-                    Log.d(Constants.APP_TAG, "Photo capture succeeded.")
                     val buffer = image.planes[0].buffer
                     val bytes = ByteArray(buffer.remaining())
                     buffer.get(bytes)
@@ -192,7 +240,6 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                 }
 
                 override fun onError(exc: ImageCaptureException) {
-                    Log.e(Constants.APP_TAG, "Photo capture failed: ${exc.message}", exc)
                     viewModel.onPhotoCaptureError(exc)
                 }
             }
@@ -205,11 +252,9 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                 requireContext(),
                 Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED -> {
-                Log.d(Constants.APP_TAG, "Camera permission already granted.")
                 viewModel.onPermissionCheckResult(true)
             }
             shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) -> {
-                Log.d(Constants.APP_TAG, "Showing camera permission rationale.")
                 showSnackbarWithAction(
                     getString(com.swifstagrime.core_ui.R.string.camera_permission_rationale),
                     getString(com.swifstagrime.core_ui.R.string.grant)
@@ -218,7 +263,6 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                 }
             }
             else -> {
-                Log.d(Constants.APP_TAG, "Requesting camera permission.")
                 requestPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
         }
