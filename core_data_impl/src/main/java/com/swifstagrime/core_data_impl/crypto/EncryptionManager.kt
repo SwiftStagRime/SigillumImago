@@ -1,14 +1,13 @@
 package com.swifstagrime.core_data_impl.crypto
 
 import android.content.Context
-import android.util.Log
-import androidx.security.crypto.MasterKey
 import androidx.security.crypto.EncryptedFile
-import com.swifstagrime.core_common.utils.Result
+import androidx.security.crypto.MasterKey
 import com.swifstagrime.core_common.constants.Constants
 import com.swifstagrime.core_common.model.DecryptionException
 import com.swifstagrime.core_common.model.EncryptionException
 import com.swifstagrime.core_common.model.MasterKeyUnavailableException
+import com.swifstagrime.core_common.utils.Result
 import com.swifstagrime.core_common.utils.wrapResultSync
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayOutputStream
@@ -16,7 +15,6 @@ import java.io.File
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.fold
 
 @Singleton
 class EncryptionManager @Inject constructor(
@@ -43,7 +41,10 @@ class EncryptionManager @Inject constructor(
             ).build()
         } catch (e: Exception) {
 
-            throw EncryptionException("Failed to initialize encrypted file for writing: ${file.name}", e)
+            throw EncryptionException(
+                "Failed to initialize encrypted file for writing: ${file.name}",
+                e
+            )
         }
     }
 
@@ -56,7 +57,10 @@ class EncryptionManager @Inject constructor(
                 EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
             ).build()
         } catch (e: Exception) {
-            throw DecryptionException("Failed to initialize encrypted file for reading: ${file.name}", e)
+            throw DecryptionException(
+                "Failed to initialize encrypted file for reading: ${file.name}",
+                e
+            )
         }
     }
 
@@ -72,9 +76,15 @@ class EncryptionManager @Inject constructor(
                             outputStream.flush()
                         }
                     } catch (ioe: IOException) {
-                        throw EncryptionException("Failed to write encrypted data to ${targetFile.name}", ioe)
+                        throw EncryptionException(
+                            "Failed to write encrypted data to ${targetFile.name}",
+                            ioe
+                        )
                     } catch (e: Exception) {
-                        throw EncryptionException("Failed to encrypt data for ${targetFile.name}", e)
+                        throw EncryptionException(
+                            "Failed to encrypt data for ${targetFile.name}",
+                            e
+                        )
                     }
                 }
             },
@@ -99,9 +109,15 @@ class EncryptionManager @Inject constructor(
                         }
                         byteStream.toByteArray()
                     } catch (ioe: IOException) {
-                        throw DecryptionException("Failed to read encrypted data from ${sourceFile.name}", ioe)
+                        throw DecryptionException(
+                            "Failed to read encrypted data from ${sourceFile.name}",
+                            ioe
+                        )
                     } catch (e: Exception) {
-                        throw DecryptionException("Failed to decrypt data from ${sourceFile.name}", e)
+                        throw DecryptionException(
+                            "Failed to decrypt data from ${sourceFile.name}",
+                            e
+                        )
                     }
                 }
             },

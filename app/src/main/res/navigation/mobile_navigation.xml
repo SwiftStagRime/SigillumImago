@@ -7,16 +7,19 @@
     <fragment
         android:id="@+id/navigation_camera"
         android:name="com.swifstagrime.feature_camera.ui.fragments.camera.CameraFragment"
-    android:label="Camera"
-    tools:layout="@layout/fragment_camera">
+        android:label="Camera"
+        tools:layout="@layout/fragment_camera">
         <deepLink app:uri="sigillum://app/camera" />
     </fragment>
     <fragment
         android:id="@+id/navigation_gallery"
-        android:name="com.swifstagrime.feature_gallery.ui.fragments.GalleryFragment"
+        android:name="com.swifstagrime.feature_gallery.ui.fragments.gallery.GalleryFragment"
         android:label="GalleryFragment"
         tools:layout="@layout/fragment_gallery">
         <deepLink app:uri="sigillum://app/gallery" />
+        <action
+            android:id="@+id/action_navigation_gallery_to_navigation_photo"
+            app:destination="@id/navigation_photo" />
     </fragment>
     <fragment
         android:id="@+id/navigation_home"
@@ -26,10 +29,20 @@
         <deepLink app:uri="sigillum://app/home" />
     </fragment>
     <fragment
-        android:id="@+id/settingsFragment"
+        android:id="@+id/navigation_settings"
         android:name="com.swifstagrime.feature_settings.ui.fragments.settings.SettingsFragment"
         android:label="SettingsFragment"
         tools:layout="@layout/fragment_settings">
         <deepLink app:uri="sigillum://app/settings" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_photo"
+        android:name="com.swifstagrime.feature_gallery.ui.fragments.photo_detail.PhotoDetailFragment"
+        android:label="PhotoDetailFragment"
+        tools:layout="@layout/fragment_photo_detail">
+        <argument
+            android:name="fileName"
+            app:argType="string" />
+        <deepLink app:uri="sigillum://app/photoDetail/{fileName}" />
     </fragment>
 </navigation>

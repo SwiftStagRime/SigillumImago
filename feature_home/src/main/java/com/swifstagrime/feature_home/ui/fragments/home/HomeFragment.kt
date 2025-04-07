@@ -1,26 +1,23 @@
 package com.swifstagrime.feature_home.ui.fragments.home
 
 import android.graphics.Color
-import android.net.Uri
-import androidx.fragment.app.viewModels
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
+import androidx.core.view.doOnPreDraw
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.swifstagrime.core_ui.ui.fragments.BaseFragment
-import com.swifstagrime.feature_home.R
 import com.swifstagrime.feature_home.databinding.FragmentHomeBinding
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.core.net.toUri
-import androidx.core.view.doOnPreDraw
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
@@ -59,7 +56,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun prepareWelcomeTextForAnimation() {
         val welcomeTextView = binding.welcomeText
-        val finalFullText = getString(com.swifstagrime.core_ui.R.string.welcome_sign).replace(" ", "\n")
+        val finalFullText =
+            getString(com.swifstagrime.core_ui.R.string.welcome_sign).replace(" ", "\n")
         welcomeTextView.text = finalFullText
         welcomeTextView.visibility = View.INVISIBLE
         heightSet = false
@@ -115,14 +113,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun setFinalTextState(fullText: String, color: Int) {
-            val finalSpannable = SpannableStringBuilder(fullText)
-            finalSpannable.setSpan(
-                ForegroundColorSpan(color),
-                0,
-                fullText.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-            binding.welcomeText.text = finalSpannable
+        val finalSpannable = SpannableStringBuilder(fullText)
+        finalSpannable.setSpan(
+            ForegroundColorSpan(color),
+            0,
+            fullText.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        binding.welcomeText.text = finalSpannable
     }
 
     private fun navigateToSettings() {

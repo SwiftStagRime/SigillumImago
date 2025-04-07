@@ -1,30 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme -->
-    <style name="Theme.SigillumImago" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Attributes common to both Light and Dark themes can go here,
-             OR define them fully in both Light and Dark specific styles below.
-             It's often cleaner to define fully in specific styles. -->
 
-        <!-- Map theme attributes to LIGHT theme colors -->
+    <style name="Theme.SigillumImago" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary_light</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="colorOnPrimary">@color/on_primary_light</item>
         <item name="colorPrimaryContainer">@color/primary_container_light</item>
         <item name="colorOnPrimaryContainer">@color/on_primary_container_light</item>
-        <!-- ... other light theme color mappings ... -->
-        <item name="android:colorBackground">@color/white</item> <!-- PURE WHITE Background -->
+        <item name="android:colorBackground">@color/white</item>
         <item name="colorOnBackground">@color/black</item>
-        <item name="colorSurface">@color/white</item> <!-- PURE WHITE Surface -->
+        <item name="colorSurface">@color/white</item>
         <item name="colorOnSurface">@color/black</item>
         <item name="colorSurfaceVariant">@color/grey_light_subtle</item>
         <item name="colorOnSurfaceVariant">@color/black</item>
         <item name="colorOutline">@color/grey_outline</item>
         <item name="colorError">@color/error_light</item>
-        <!-- ... etc for all light theme colors -->
-
-        <!-- Common settings like shapes and component styles -->
         <item name="android:statusBarColor">@color/white</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="materialAlertDialogTheme">@style/AppTheme.Dialog.Rounded</item>
+    </style>
+
+    <style name="AppShapeAppearance.Dialog.Rounded" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/card_corner_radius_large</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Button.Positive" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?colorOnPrimary</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Button.Negative" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?colorOnPrimary</item>
+    </style>
+
+    <style name="AppTheme.Dialog.Rounded" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceMediumComponent">@style/AppShapeAppearance.Dialog.Rounded</item>
+        <item name="buttonBarPositiveButtonStyle">@style/AppTheme.Dialog.Button.Positive</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AppTheme.Dialog.Button.Negative</item>
     </style>
 </resources>
 

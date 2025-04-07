@@ -1,10 +1,6 @@
 package com.swifstagrime.core_data_impl.repository
 
 import android.content.Context
-import android.util.Log
-import com.swifstagrime.core_data_api.repository.SecureMediaRepository
-import com.swifstagrime.core_data_impl.crypto.EncryptionManager
-import dagger.hilt.android.qualifiers.ApplicationContext
 import com.swifstagrime.core_common.constants.Constants
 import com.swifstagrime.core_common.model.DataNotFoundException
 import com.swifstagrime.core_common.model.MediaType
@@ -13,6 +9,9 @@ import com.swifstagrime.core_common.utils.Result
 import com.swifstagrime.core_common.utils.wrapResultSync
 import com.swifstagrime.core_data_api.model.MediaFile
 import com.swifstagrime.core_data_api.model.MediaMetadata
+import com.swifstagrime.core_data_api.repository.SecureMediaRepository
+import com.swifstagrime.core_data_impl.crypto.EncryptionManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -70,26 +69,28 @@ class SecureMediaRepositoryImpl @Inject constructor(
     }
 
     /** Reads the secure directory and constructs the list of MediaFile objects. */
-    private suspend fun loadMediaFilesFromDisk(): Result<List<MediaFile>> = withContext(Dispatchers.IO) {
-        wrapResultSync { // Using wrapResultSync as file ops aren't suspend funcs
-            if (!secureDir.exists() || !secureDir.isDirectory) {
-                // Log.w(Constants.APP_TAG, "Secure directory doesn't exist or isn't a directory.")
-                return@wrapResultSync emptyList() // Return empty list if dir is bad
-            }
-
-            secureDir.listFiles { _, name -> name.endsWith(Constants.ENCRYPTED_FILE_EXTENSION) }
-                ?.mapNotNull { encryptedFile ->
-                    parseMediaFile(encryptedFile) // Use helper to parse each file
+    private suspend fun loadMediaFilesFromDisk(): Result<List<MediaFile>> =
+        withContext(Dispatchers.IO) {
+            wrapResultSync { // Using wrapResultSync as file ops aren't suspend funcs
+                if (!secureDir.exists() || !secureDir.isDirectory) {
+                    // Log.w(Constants.APP_TAG, "Secure directory doesn't exist or isn't a directory.")
+                    return@wrapResultSync emptyList() // Return empty list if dir is bad
                 }
-                ?.sortedByDescending { it.createdAtTimestampMillis } // Sort by date descending
-                ?: emptyList() // Return empty list if listFiles returns null
+
+                secureDir.listFiles { _, name -> name.endsWith(Constants.ENCRYPTED_FILE_EXTENSION) }
+                    ?.mapNotNull { encryptedFile ->
+                        parseMediaFile(encryptedFile) // Use helper to parse each file
+                    }
+                    ?.sortedByDescending { it.createdAtTimestampMillis } // Sort by date descending
+                    ?: emptyList() // Return empty list if listFiles returns null
+            }
         }
-    }
 
     /** Helper to parse metadata from filename and .meta file */
     private fun parseMediaFile(encryptedFile: File): MediaFile? {
         try {
-            val baseNameWithExtension = encryptedFile.nameWithoutExtension // e.g., "photo_1678886400000_uuid.jpg"
+            val baseNameWithExtension =
+                encryptedFile.nameWithoutExtension // e.g., "photo_1678886400000_uuid.jpg"
             val metaFile = File(secureDir, "$baseNameWithExtension.meta")
 
             if (!metaFile.exists()) {
@@ -105,8 +106,10 @@ class SecureMediaRepositoryImpl @Inject constructor(
             // --> Let's refine the save process to store timestamp explicitly in meta file too.
             // --> For now, we will just use the filename itself as the unique ID passed around
 
-            val mediaType = MediaType.fromFilename(baseNameWithExtension) ?: MediaType.DOCUMENT // Fallback
-            val createdAt = encryptedFile.lastModified() // Use file mod time as creation time for now
+            val mediaType =
+                MediaType.fromFilename(baseNameWithExtension) ?: MediaType.DOCUMENT // Fallback
+            val createdAt =
+                encryptedFile.lastModified() // Use file mod time as creation time for now
 
             // 2. Read Metadata file
             val metaContent = metaFile.readText()
@@ -140,7 +143,8 @@ class SecureMediaRepositoryImpl @Inject constructor(
         // Using UUID ensures uniqueness even if saved at the exact same millisecond.
         val timestamp = System.currentTimeMillis()
         val originalExtension = desiredFileName.substringAfterLast('.', "")
-        val safeExtension = if (originalExtension.isNotEmpty()) ".$originalExtension" else mediaType.defaultFileExtension
+        val safeExtension =
+            if (originalExtension.isNotEmpty()) ".$originalExtension" else mediaType.defaultFileExtension
         val uniqueBaseName = "${timestamp}_${UUID.randomUUID()}$safeExtension"
 
         val encryptedFile = File(secureDir, uniqueBaseName + Constants.ENCRYPTED_FILE_EXTENSION)
@@ -186,19 +190,20 @@ class SecureMediaRepositoryImpl @Inject constructor(
         Result.Success(savedMediaFile)
     }
 
-    override suspend fun getDecryptedMediaData(fileName: String): Result<ByteArray> = withContext(Dispatchers.IO) {
-        val encryptedFile = File(secureDir, fileName + Constants.ENCRYPTED_FILE_EXTENSION)
+    override suspend fun getDecryptedMediaData(fileName: String): Result<ByteArray> =
+        withContext(Dispatchers.IO) {
+            val encryptedFile = File(secureDir, fileName + Constants.ENCRYPTED_FILE_EXTENSION)
 
-        if (!encryptedFile.exists()) {
-            return@withContext Result.Error(DataNotFoundException("File not found: $fileName"))
+            if (!encryptedFile.exists()) {
+                return@withContext Result.Error(DataNotFoundException("File not found: $fileName"))
+            }
+
+            // Delegate decryption to EncryptionManager
+            val decryptResult = encryptionManager.decryptDataFromFile(encryptedFile)
+
+            // Map potential DecryptionException from manager if needed, or just pass through
+            decryptResult
         }
-
-        // Delegate decryption to EncryptionManager
-        val decryptResult = encryptionManager.decryptDataFromFile(encryptedFile)
-
-        // Map potential DecryptionException from manager if needed, or just pass through
-        decryptResult
-    }
 
 
     override suspend fun deleteMedia(fileName: String): Result<Unit> = withContext(Dispatchers.IO) {
@@ -228,7 +233,8 @@ class SecureMediaRepositoryImpl @Inject constructor(
                 Result.Success(Unit)
             } else {
                 // If either delete failed and the file still exists
-                error = StorageIOException("Failed to delete one or both files for $fileName. Encrypted exists: ${encryptedFile.exists()}, Meta exists: ${metaFile.exists()}")
+                error =
+                    StorageIOException("Failed to delete one or both files for $fileName. Encrypted exists: ${encryptedFile.exists()}, Meta exists: ${metaFile.exists()}")
                 Result.Error(error)
             }
 
@@ -238,21 +244,22 @@ class SecureMediaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getMediaFile(fileName: String): Result<MediaFile> = withContext(Dispatchers.IO) {
-        val encryptedFile = File(secureDir, fileName + Constants.ENCRYPTED_FILE_EXTENSION)
-        if (!encryptedFile.exists()) {
-            return@withContext Result.Error(DataNotFoundException("File not found: $fileName"))
+    override suspend fun getMediaFile(fileName: String): Result<MediaFile> =
+        withContext(Dispatchers.IO) {
+            val encryptedFile = File(secureDir, fileName + Constants.ENCRYPTED_FILE_EXTENSION)
+            if (!encryptedFile.exists()) {
+                return@withContext Result.Error(DataNotFoundException("File not found: $fileName"))
+            }
+            // Re-use the parsing logic. This might be slightly inefficient if called often,
+            // but ensures consistency. Could optimize by checking the internal flow first.
+            val mediaFile = parseMediaFile(encryptedFile)
+            if (mediaFile != null) {
+                Result.Success(mediaFile)
+            } else {
+                // Parsing failed, likely missing meta file or corruption
+                Result.Error(DataNotFoundException("Metadata parsing failed for $fileName"))
+            }
         }
-        // Re-use the parsing logic. This might be slightly inefficient if called often,
-        // but ensures consistency. Could optimize by checking the internal flow first.
-        val mediaFile = parseMediaFile(encryptedFile)
-        if (mediaFile != null) {
-            Result.Success(mediaFile)
-        } else {
-            // Parsing failed, likely missing meta file or corruption
-            Result.Error(DataNotFoundException("Metadata parsing failed for $fileName"))
-        }
-    }
 
     override suspend fun deleteAllMedia(): Result<Unit> = withContext(Dispatchers.IO) {
         var allDeleted = true
@@ -263,7 +270,8 @@ class SecureMediaRepositoryImpl @Inject constructor(
                 if (!file.delete()) {
                     // Log.w(Constants.APP_TAG, "Failed to delete file during deleteAll: ${file.name}")
                     allDeleted = false
-                    if(firstError == null) firstError = StorageIOException("Failed to delete ${file.name}")
+                    if (firstError == null) firstError =
+                        StorageIOException("Failed to delete ${file.name}")
                 }
             }
 
@@ -272,7 +280,9 @@ class SecureMediaRepositoryImpl @Inject constructor(
             if (allDeleted) {
                 Result.Success(Unit)
             } else {
-                Result.Error(firstError ?: StorageIOException("Failed to delete one or more files."))
+                Result.Error(
+                    firstError ?: StorageIOException("Failed to delete one or more files.")
+                )
             }
         } catch (e: Exception) {
             // Log.e(Constants.APP_TAG, "Error during deleteAllMedia", e)

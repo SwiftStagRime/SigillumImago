@@ -16,4 +16,12 @@
     <string name="gallery_empty_message">No photos found.</string>
     <string name="gallery_error_loading">Error loading gallery.</string>
     <string name="cd_gallery_thumbnail">Media thumbnail</string>
+    <string name="gallery_selection_title" translatable="false">%1$d selected</string>
+    <string name="cd_close_selection_mode">Close selection mode</string>
+    <string name="cd_full_photo_view">Full screen photo view</string>
+    <string name="menu_delete">Delete</string>
+    <string name="delete_confirmation_title">Confirm Delete</string>
+    <string name="delete_confirmation_message">Are you sure you want to permanently delete this photo?</string>
+    <string name="delete_confirm_button">Delete</string>
+    <string name="toolbar_title_selected_items">Selected: %1$d</string>
 </resources>

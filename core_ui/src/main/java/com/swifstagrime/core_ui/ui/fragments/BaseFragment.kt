@@ -5,14 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 abstract class BaseFragment<VB : ViewBinding> : Fragment() {
 
@@ -20,7 +13,8 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
     private var _binding: VB? = null
 
     protected val binding: VB
-        get() = _binding ?: throw IllegalStateException("Binding accessed outside of valid lifecycle.")
+        get() = _binding
+            ?: throw IllegalStateException("Binding accessed outside of valid lifecycle.")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,6 +39,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
     protected open fun setupViews() {
 
     }
+
     protected open fun observeViewModel() {
 
     }

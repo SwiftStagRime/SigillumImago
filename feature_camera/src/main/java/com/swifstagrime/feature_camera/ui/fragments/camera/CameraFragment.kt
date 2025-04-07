@@ -1,21 +1,26 @@
 package com.swifstagrime.feature_camera.ui.fragments.camera
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import androidx.fragment.app.viewModels
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.FocusMeteringAction
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -23,19 +28,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.common.util.concurrent.ListenableFuture
 import com.swifstagrime.core_common.constants.Constants
 import com.swifstagrime.core_ui.ui.fragments.BaseFragment
-import com.swifstagrime.feature_camera.R
 import com.swifstagrime.feature_camera.databinding.FragmentCameraBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import android.Manifest
-import android.annotation.SuppressLint
-import android.view.MotionEvent
-import androidx.camera.core.Camera
-import androidx.camera.core.CameraInfoUnavailableException
-import androidx.camera.core.FocusMeteringAction
-import androidx.camera.view.PreviewView
 
 @AndroidEntryPoint
 class CameraFragment : BaseFragment<FragmentCameraBinding>() {
@@ -84,39 +81,25 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun setupViews() {
-        // --- Button Listeners ---
         binding.captureButton.setOnClickListener { viewModel.onTakePhotoClicked() }
         binding.switchCameraButton.setOnClickListener { viewModel.onSwitchCameraClicked() }
         binding.flashButton.setOnClickListener { viewModel.onFlashButtonClicked() }
         binding.galleryButton.setOnClickListener { showSnackbar("Gallery feature not yet implemented.") }
 
-        // --- Tap-to-Focus Listener ---
         binding.previewView.setOnTouchListener { view, motionEvent ->
             when (motionEvent.action) {
-                MotionEvent.ACTION_DOWN -> return@setOnTouchListener true // Consume ACTION_DOWN
+                MotionEvent.ACTION_DOWN -> return@setOnTouchListener true
                 MotionEvent.ACTION_UP -> {
-                    // Get the MeteringPointFactory from PreviewView
                     val factory = (view as PreviewView).meteringPointFactory
-
-                    // Create a MeteringPoint from the tap coordinates
                     val point = factory.createPoint(motionEvent.x, motionEvent.y)
-
-                    // Create a FocusMeteringAction configuration
                     val action = FocusMeteringAction.Builder(point)
-                        // Optionally auto-cancel after a timeout
-                        // .setAutoCancelDuration(5, TimeUnit.SECONDS)
-                        // Focus and Exposure (AF/AE)
                         .addPoint(point, FocusMeteringAction.FLAG_AF or FocusMeteringAction.FLAG_AE)
                         .build()
-
-                    // Trigger focus and metering based on the action
                     startFocusAndMetering(action)
-
-                    // Optionally call performClick for accessibility if just using ACTION_UP
-                    // view.performClick()
-                    return@setOnTouchListener true // Consume ACTION_UP
+                    return@setOnTouchListener true
                 }
-                else -> return@setOnTouchListener false // Ignore other actions
+
+                else -> return@setOnTouchListener false
             }
         }
     }
@@ -128,7 +111,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                     viewModel.cameraInitState.collect { state ->
                         Log.d(Constants.APP_TAG, "CameraInitState changed: $state")
                         when (state) {
-                            CameraInitState.Idle -> { /* Initial state */ }
+                            CameraInitState.Idle -> {}
                             CameraInitState.NeedsPermission -> requestCameraPermission()
                             CameraInitState.PermissionDenied -> showPermissionDeniedUI()
                             CameraInitState.Initializing -> startCamera()
@@ -162,9 +145,10 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                     viewModel.lensFacing.collect { facing ->
                         if (currentLensFacing != facing || camera == null) {
                             currentLensFacing = facing
-                            if(viewModel.cameraInitState.value == CameraInitState.Initializing ||
+                            if (viewModel.cameraInitState.value == CameraInitState.Initializing ||
                                 viewModel.cameraInitState.value == CameraInitState.Ready ||
-                                viewModel.cameraInitState.value == CameraInitState.NeedsPermission) {
+                                viewModel.cameraInitState.value == CameraInitState.NeedsPermission
+                            ) {
                                 startCamera()
                             }
                         }
@@ -232,7 +216,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
             ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
-                    val buffer = image.planes[0].buffer
+                    val buffer = image.planes.first().buffer
                     val bytes = ByteArray(buffer.remaining())
                     buffer.get(bytes)
                     image.close()
@@ -254,6 +238,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
             ) == PackageManager.PERMISSION_GRANTED -> {
                 viewModel.onPermissionCheckResult(true)
             }
+
             shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) -> {
                 showSnackbarWithAction(
                     getString(com.swifstagrime.core_ui.R.string.camera_permission_rationale),
@@ -262,6 +247,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                     requestPermissionLauncher.launch(Manifest.permission.CAMERA)
                 }
             }
+
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
@@ -269,7 +255,8 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
     }
 
     private fun showPermissionDeniedUI() {
-        binding.statusTextView.text = getString(com.swifstagrime.core_ui.R.string.camera_permission_denied_message)
+        binding.statusTextView.text =
+            getString(com.swifstagrime.core_ui.R.string.camera_permission_denied_message)
         binding.statusTextView.visibility = View.VISIBLE
         binding.captureButton.isEnabled = false
         binding.switchCameraButton.isEnabled = false
@@ -285,7 +272,10 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
     }
 
     private fun showCameraErrorUI(message: String?) {
-        binding.statusTextView.text = getString(com.swifstagrime.core_ui.R.string.camera_error_message, message ?: "Unknown error")
+        binding.statusTextView.text = getString(
+            com.swifstagrime.core_ui.R.string.camera_error_message,
+            message ?: "Unknown error"
+        )
         binding.statusTextView.visibility = View.VISIBLE
         binding.captureButton.isEnabled = false
         binding.switchCameraButton.isEnabled = false
@@ -301,19 +291,23 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
 
         when (state) {
             is CaptureState.Saving -> {
-                binding.statusTextView.text = getString(com.swifstagrime.core_ui.R.string.saving_photo)
+                binding.statusTextView.text =
+                    getString(com.swifstagrime.core_ui.R.string.saving_photo)
                 binding.statusTextView.visibility = View.VISIBLE
             }
+
             is CaptureState.Success -> {
                 binding.statusTextView.visibility = View.GONE
                 showSnackbar("Photo saved: ${state.savedMediaFile.fileName}")
                 viewModel.resetCaptureState()
             }
+
             is CaptureState.Error -> {
                 binding.statusTextView.visibility = View.GONE
                 showSnackbar("Error: ${state.message}")
                 viewModel.resetCaptureState()
             }
+
             else -> {
                 binding.statusTextView.visibility = View.GONE
             }
@@ -334,7 +328,11 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 
-    private fun showSnackbarWithAction(message: String, actionText: String, action: (View) -> Unit) {
+    private fun showSnackbarWithAction(
+        message: String,
+        actionText: String,
+        action: (View) -> Unit
+    ) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
             .setAction(actionText, action)
             .show()

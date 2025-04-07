@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_gallery"
+    app:startDestination="@id/navigation_photo">
+
+    <fragment
+        android:id="@+id/navigation_photo"
+        android:name="com.swifstagrime.feature_gallery.ui.fragments.photo_detail.PhotoDetailFragment"
+        android:label="PhotoDetailFragment">
+        <argument
+            android:name="fileName"
+            app:argType="string" />
+        <deepLink app:uri="sigillum://app/photoDetail/{fileName}" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_gallery"
+        android:name="com.swifstagrime.feature_gallery.ui.fragments.gallery.GalleryFragment"
+        android:label="GalleryFragment">
+        <action
+            android:id="@+id/action_navigation_gallery_to_navigation_photo"
+            app:destination="@id/navigation_photo" />
+    </fragment>
+</navigation>

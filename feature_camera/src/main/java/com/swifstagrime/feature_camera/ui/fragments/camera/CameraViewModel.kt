@@ -67,7 +67,10 @@ class CameraViewModel @Inject constructor(
     private val _lensFacing = MutableStateFlow(LensFacing.BACK)
     val lensFacing: StateFlow<LensFacing> = _lensFacing.asStateFlow()
 
-    fun onPermissionCheckResult(hasCameraPermission: Boolean, hasStoragePermission: Boolean = true) {
+    fun onPermissionCheckResult(
+        hasCameraPermission: Boolean,
+        hasStoragePermission: Boolean = true
+    ) {
         if (hasCameraPermission) {
             _cameraInitState.value = CameraInitState.Initializing
         } else {
@@ -116,6 +119,7 @@ class CameraViewModel @Inject constructor(
                 is Result.Success -> {
                     _captureState.value = CaptureState.Success(saveResult.data)
                 }
+
                 is Result.Error -> {
                     _captureState.value = CaptureState.Error(
                         message = "Failed to save photo: ${saveResult.exception.message}",

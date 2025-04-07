@@ -2,14 +2,10 @@ package com.swifstagrime.sigillumimago
 
 import android.os.Bundle
 import android.view.View
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.swifstagrime.feature_camera.ui.fragments.camera.CameraFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.swifstagrime.sigillumimago.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -31,7 +27,9 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.navigation_camera) {
+            if (destination.id == R.id.navigation_camera ||
+                destination.id == R.id.navigation_photo
+            ) {
                 navView.visibility = View.GONE
             } else {
                 navView.visibility = View.VISIBLE

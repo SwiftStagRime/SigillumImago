@@ -7,7 +7,12 @@ enum class MediaType(val mimeTypePrefix: String, val defaultFileExtension: Strin
 
     companion object {
         fun fromMimeType(mimeType: String?): MediaType? {
-            return entries.find { mimeType?.startsWith(it.mimeTypePrefix, ignoreCase = true) == true }
+            return entries.find {
+                mimeType?.startsWith(
+                    it.mimeTypePrefix,
+                    ignoreCase = true
+                ) == true
+            }
         }
 
         fun fromFilename(filename: String?): MediaType? {

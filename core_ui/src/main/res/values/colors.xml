@@ -30,14 +30,13 @@
     <color name="error_container_dark">#8C1D18</color>
     <color name="on_error_container_dark">#F9DEDC</color>
 
-    <color name="soft_green_start">#65D869</color> <!-- Slightly less intense green -->
-    <color name="soft_green_end">#4ECB52</color>   <!-- Slightly darker for depth -->
-    <color name="soft_red_start">#F86565</color>     <!-- Softer, slightly pinkish red -->
-    <color name="soft_red_end">#E84A4A</color>       <!-- Darker version -->
-    <color name="soft_blue_start">#5F7DF8</color>    <!-- Softer blue -->
-    <color name="soft_blue_end">#4969E8</color>      <!-- Darker version -->
+    <color name="soft_green_start">#65D869</color>
+    <color name="soft_green_end">#4ECB52</color>
+    <color name="soft_red_start">#F86565</color>
+    <color name="soft_red_end">#E84A4A</color>
+    <color name="soft_blue_start">#5F7DF8</color>
+    <color name="soft_blue_end">#4969E8</color>
 
-    <!-- Solid versions (optional, if needed elsewhere) -->
     <color name="soft_green">#5AD05E</color>
     <color name="soft_red">#F05555</color>
     <color name="soft_blue">#5271F0</color>
