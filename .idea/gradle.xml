@@ -20,6 +20,7 @@
             <option value="$PROJECT_DIR$/feature_camera" />
             <option value="$PROJECT_DIR$/feature_gallery" />
             <option value="$PROJECT_DIR$/feature_home" />
+            <option value="$PROJECT_DIR$/feature_recorder" />
             <option value="$PROJECT_DIR$/feature_settings" />
           </set>
         </option>

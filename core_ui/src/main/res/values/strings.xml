@@ -24,4 +24,41 @@
     <string name="delete_confirmation_message">Are you sure you want to permanently delete this photo?</string>
     <string name="delete_confirm_button">Delete</string>
     <string name="toolbar_title_selected_items">Selected: %1$d</string>
+
+    <string name="auth_title">Unlock Secure Photos</string>
+    <string name="auth_enter_pin">Enter your 5-digit PIN</string>
+    <string name="auth_incorrect_pin">Incorrect PIN. Try again.</string>
+    <string name="auth_use_biometrics">Use Biometrics</string>
+    <string name="auth_backspace">Backspace</string>
+    <string name="auth_biometric_prompt_title">Unlock SigilliumImago</string>
+    <string name="error_starting_main_activity">Error starting Main Activity</string>
+
+    <string name="auth_biometric_failed">Biometric authentication failed.</string>
+    <string name="auth_generic_error">An error occurred. Please try again.</string>
+    <string name="verifying_pin">Verifying PIN…</string> <!-- Added -->
+
+    <string name="auth_pin_setup_prompt">Set a 5-digit PIN</string>
+    <string name="auth_pin_confirm_prompt">Confirm your 5-digit PIN</string>
+    <string name="auth_pin_mismatch">PINs do not match. Please try again.</string>
+    <string name="auth_pin_saving">Saving PIN…</string>
+    <string name="auth_pin_set_success">PIN Set Successfully!</string>
+    <string name="auth_pin_save_error">Could not save PIN. Please try again.</string>
+
+    <string name="cd_play_pause_recording">Play or pause recording</string>
+    <string name="cd_start_stop_recording">Start or stop recording</string>
+    <string name="cd_discard_recording">Discard recording</string>
+    <string name="cd_save_recording">Save recording</string>
+    <string name="recording_permission_denied">Audio recording permission denied. Please grant permission in settings.</string>
+    <string name="recording_permission_rationale">Audio recording permission is needed to record audio.</string>
+    <string name="cancel">Cancel</string>
+    <string name="dialog_discard_title">Discard Recording?</string>
+    <string name="dialog_discard_message">Are you sure you want to discard this recording?</string>
+    <string name="dialog_save_title">Save Recording</string>
+    <string name="dialog_save_message">Enter a name for the recording:</string>
+    <string name="save">Save</string>
+    <string name="discard">Discard</string>
+    <string name="saving_recording">Saving…</string>
+    <string name="recording_saved">Recording saved: %1$s</string>
+    <string name="recording_error">Error: %1$s</string>
+    <string name="default_recording_name">Recording</string>
 </resources>

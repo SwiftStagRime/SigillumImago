@@ -1,9 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginStart="@dimen/margin_medium"
+    android:layout_marginTop="@dimen/margin_medium"
+    android:layout_marginEnd="@dimen/margin_medium"
+    android:fitsSystemWindows="true"
+    android:theme="@style/Theme.SigillumImago"
     tools:context=".ui.activities.AuthActivity">
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/auth_title"
+        android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/statusTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:minHeight="40dp"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        tools:text="@string/auth_enter_your_pin" />
+
+    <LinearLayout
+        android:id="@+id/pinDotsLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/statusTextView">
+
+        <ImageView
+            android:id="@+id/pinDot1"
+            style="@style/PinDot" />
+
+        <ImageView
+            android:id="@+id/pinDot2"
+            style="@style/PinDot" />
+
+        <ImageView
+            android:id="@+id/pinDot3"
+            style="@style/PinDot" />
+
+        <ImageView
+            android:id="@+id/pinDot4"
+            style="@style/PinDot" />
+
+        <ImageView
+            android:id="@+id/pinDot5"
+            style="@style/PinDot" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/pinPadContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pinDotsLayout"
+        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintWidth_max="360dp">
+
+        <LinearLayout
+            android:id="@+id/row1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button1"
+                style="@style/PinPadButton"
+                android:text="1" />
+
+            <Button
+                android:id="@+id/button2"
+                style="@style/PinPadButton"
+                android:text="2" />
+
+            <Button
+                android:id="@+id/button3"
+                style="@style/PinPadButton"
+                android:text="3" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/row2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button4"
+                style="@style/PinPadButton"
+                android:text="4" />
+
+            <Button
+                android:id="@+id/button5"
+                style="@style/PinPadButton"
+                android:text="5" />
+
+            <Button
+                android:id="@+id/button6"
+                style="@style/PinPadButton"
+                android:text="6" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/row3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button7"
+                style="@style/PinPadButton"
+                android:text="7" />
+
+            <Button
+                android:id="@+id/button8"
+                style="@style/PinPadButton"
+                android:text="8" />
+
+            <Button
+                android:id="@+id/button9"
+                style="@style/PinPadButton"
+                android:text="9" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/row4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/buttonBiometric"
+                style="@style/PinPadButton.Icon"
+                android:contentDescription="@string/auth_use_biometrics"
+                android:src="@drawable/ic_fingerprint"
+                android:tint="?attr/colorOnPrimary"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <Button
+                android:id="@+id/button0"
+                style="@style/PinPadButton"
+                android:text="0" />
+
+            <ImageButton
+                android:id="@+id/buttonBackspace"
+                style="@style/PinPadButton.Icon"
+                android:contentDescription="@string/auth_backspace"
+                android:src="@drawable/ic_backspace"
+                android:tint="?attr/colorOnPrimary" />
+        </LinearLayout>
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

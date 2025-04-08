@@ -29,6 +29,13 @@
         <deepLink app:uri="sigillum://app/home" />
     </fragment>
     <fragment
+        android:id="@+id/navigation_recorder"
+        android:name="com.swifstagrime.feature_recorder.ui.fragments.recorder.RecorderFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_recorder">
+        <deepLink app:uri="sigillum://app/recorder" />
+    </fragment>
+    <fragment
         android:id="@+id/navigation_settings"
         android:name="com.swifstagrime.feature_settings.ui.fragments.settings.SettingsFragment"
         android:label="SettingsFragment"

@@ -52,8 +52,9 @@ dependencies {
     implementation(project(":feature_gallery"))
     implementation(project(":feature_settings"))
     implementation(project(":feature_home"))
+    implementation(project(":feature_recorder"))
 
-
+    //Common
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

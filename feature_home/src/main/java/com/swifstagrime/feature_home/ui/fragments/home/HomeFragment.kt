@@ -132,7 +132,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun navigateToAudioRecorder() {
-        findNavController().navigate("sigillum://app/audio_recorder".toUri())
+        findNavController().navigate("sigillum://app/recorder".toUri())
     }
 
     private fun navigateToDocuments() {
