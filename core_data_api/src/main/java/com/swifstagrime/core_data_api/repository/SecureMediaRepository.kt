@@ -15,6 +15,7 @@ interface SecureMediaRepository {
     fun getAllMediaFiles(): Flow<List<MediaFile>>
     suspend fun getDecryptedMediaData(fileName: String): Result<ByteArray>
     suspend fun deleteMedia(fileName: String): Result<Unit>
-    suspend fun getMediaFile(fileName: String): Result<MediaFile> // Added this based on thought process
+    suspend fun getMediaFile(fileName: String): Result<MediaFile>
     suspend fun deleteAllMedia(): Result<Unit>
+    suspend fun getDecryptedDisplayName(internalFileName: String): Result<String?>
 }

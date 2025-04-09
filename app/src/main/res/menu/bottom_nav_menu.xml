@@ -12,9 +12,9 @@
         android:title="Gallery" />
 
     <item
-        android:id="@+id/navigation_audio"
+        android:id="@+id/navigation_recordings"
         android:icon="@drawable/ic_audio"
-        android:title="Audios" />
+        android:title="Recordings" />
 
     <item
         android:id="@+id/navigation_documents"

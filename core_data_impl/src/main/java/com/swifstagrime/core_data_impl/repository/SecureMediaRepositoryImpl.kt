@@ -1,12 +1,14 @@
 package com.swifstagrime.core_data_impl.repository
 
 import android.content.Context
+import android.util.Base64
 import android.util.Log
 import com.swifstagrime.core_common.constants.Constants
 import com.swifstagrime.core_common.model.DataNotFoundException
 import com.swifstagrime.core_common.model.MediaType
 import com.swifstagrime.core_common.model.StorageIOException
 import com.swifstagrime.core_common.utils.Result
+import com.swifstagrime.core_common.utils.wrapResult
 import com.swifstagrime.core_common.utils.wrapResultSync
 import com.swifstagrime.core_data_api.model.MediaFile
 import com.swifstagrime.core_data_api.model.MediaMetadata
@@ -23,6 +25,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.charset.StandardCharsets
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -75,36 +79,105 @@ class SecureMediaRepositoryImpl @Inject constructor(
 
     private fun parseMediaFile(encryptedFile: File): MediaFile? {
         try {
-            val baseNameWithExtension =
-                encryptedFile.nameWithoutExtension
-            val metaFile = File(secureDir, "$baseNameWithExtension.meta")
+            val internalFileName = encryptedFile.nameWithoutExtension
+            val metaFile = File(secureDir, "$internalFileName.meta")
 
             if (!metaFile.exists()) {
+                Log.w(Constants.APP_TAG, "Metadata file missing for ${encryptedFile.name}")
                 return null
             }
 
-            val mediaType =
-                MediaType.fromFilename(baseNameWithExtension) ?: MediaType.DOCUMENT
-            val createdAt =
-                encryptedFile.lastModified()
+            val timestamp = internalFileName.substringBefore('_').toLongOrNull()
+            if (timestamp == null) {
+                Log.w(Constants.APP_TAG, "Could not parse timestamp from filename: $internalFileName")
+                return null
+            }
+
+            val mediaType = MediaType.fromFilename(internalFileName) ?: MediaType.DOCUMENT
 
             val metaContent = metaFile.readText()
             val metadata = MediaMetadata.fromFileContent(metaContent)
 
             if (metadata == null) {
-                Log.w(Constants.APP_TAG, "Could not parse metadata for ${metaFile.name}")
+                Log.w(Constants.APP_TAG, "Could not parse metadata from ${metaFile.name}")
                 return null
             }
 
             return MediaFile(
-                fileName = baseNameWithExtension,
+                fileName = internalFileName,
                 mediaType = mediaType,
-                createdAtTimestampMillis = createdAt,
+                createdAtTimestampMillis = timestamp,
                 sizeBytes = metadata.originalSizeBytes
             )
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e(Constants.APP_TAG, "Failed to parse media file info for ${encryptedFile.name}", e)
             return null
         }
+    }
+
+    override suspend fun getDecryptedDisplayName(internalFileName: String): Result<String?> {
+        return wrapResult {
+            withContext(Dispatchers.IO) {
+                val metaFile = File(secureDir, "$internalFileName.meta")
+
+                if (!metaFile.exists()) {
+                    throw DataNotFoundException("Metadata file not found for $internalFileName")
+                }
+
+                val timestamp = internalFileName.substringBefore('_').toLongOrNull()
+                    ?: throw IllegalArgumentException("Cannot parse timestamp from filename: $internalFileName")
+
+                val metaContent: String = try {
+                    metaFile.readText()
+                } catch (e: IOException) {
+                    throw StorageIOException("Failed to read metadata file: ${metaFile.name}", e)
+                }
+
+                val metadata = MediaMetadata.fromFileContent(metaContent)
+                    ?: throw StorageIOException("Failed to parse metadata content for ${metaFile.name}")
+
+                if (metadata.encryptedFileNameBase64 != null) {
+                    val encodedName = metadata.encryptedFileNameBase64
+                    decodeAndDecryptName(encodedName.toString(), timestamp)
+                } else {
+                    null
+                }
+            }
+        }
+    }
+
+
+    private fun decodeAndDecryptName(encodedName: String, timestamp: Long): String? {
+        return try {
+            val encryptedBytes = Base64.decode(encodedName, Base64.URL_SAFE or Base64.NO_WRAP)
+            if (encryptedBytes.isEmpty()) return null
+            val decryptedBytes = xorCrypt(encryptedBytes, timestamp)
+            String(decryptedBytes, StandardCharsets.UTF_8)
+        } catch (e: IllegalArgumentException) {
+            Log.e(Constants.APP_TAG, "Failed to Base64 decode name '$encodedName'", e)
+            null
+        } catch (e: Exception) {
+            Log.e(Constants.APP_TAG, "Failed to decode/decrypt name '$encodedName'", e)
+            null
+        }
+    }
+
+    private fun xorCrypt(data: ByteArray, timestamp: Long): ByteArray {
+        if (data.isEmpty()) return data
+
+        val keyBytes = ByteBuffer.allocate(Long.SIZE_BYTES).putLong(timestamp).array()
+        val result = ByteArray(data.size)
+
+        for (i in data.indices) {
+            result[i] = (data[i].toInt() xor keyBytes[i % keyBytes.size].toInt()).toByte()
+        }
+        return result
+    }
+
+    private fun encryptAndEncodeName(name: String, timestamp: Long): String {
+        val nameBytes = name.toByteArray(StandardCharsets.UTF_8)
+        val encryptedBytes = xorCrypt(nameBytes, timestamp)
+        return Base64.encodeToString(encryptedBytes, Base64.URL_SAFE or Base64.NO_WRAP)
     }
 
     override suspend fun saveMedia(
@@ -115,35 +188,54 @@ class SecureMediaRepositoryImpl @Inject constructor(
 
         val timestamp = System.currentTimeMillis()
         val originalExtension = desiredFileName.substringAfterLast('.', "")
-        val safeExtension =
-            if (originalExtension.isNotEmpty()) ".$originalExtension" else mediaType.defaultFileExtension
-        val uniqueBaseName = "${timestamp}_${UUID.randomUUID()}$safeExtension"
+        val safeExtension = if (originalExtension.isNotEmpty() && !desiredFileName.endsWith(".")) {
+            ".$originalExtension"
+        } else {
+            mediaType.defaultFileExtension
+        }
+        val uniqueInternalName = "${timestamp}_${UUID.randomUUID()}$safeExtension"
 
-        val encryptedFile = File(secureDir, uniqueBaseName + Constants.ENCRYPTED_FILE_EXTENSION)
-        val metaFile = File(secureDir, "$uniqueBaseName.meta")
+        val encryptedFile = File(secureDir, uniqueInternalName + Constants.ENCRYPTED_FILE_EXTENSION)
+        val metaFile = File(secureDir, "$uniqueInternalName.meta")
 
         val encryptResult = encryptionManager.encryptDataToFile(data, encryptedFile)
         if (encryptResult is Result.Error) {
             return@withContext Result.Error(encryptResult.exception)
         }
 
-        val metadata = MediaMetadata(originalSizeBytes = data.size.toLong())
+        val encryptedNameBase64 = try {
+            if (desiredFileName.isNotBlank()) {
+                encryptAndEncodeName(desiredFileName, timestamp)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e(Constants.APP_TAG, "Failed to encrypt desired filename, proceeding without it.", e)
+            null
+        }
+
+        val metadata = MediaMetadata(
+            originalSizeBytes = data.size.toLong(),
+            encryptedFileNameBase64 = encryptedNameBase64
+        )
         val metaSaveResult = wrapResultSync<Unit> {
             try {
                 metaFile.writeText(metadata.toFileContent())
             } catch (e: IOException) {
+                Log.e(Constants.APP_TAG, "Failed to write metadata file for $uniqueInternalName", e)
                 encryptedFile.delete()
-                throw StorageIOException("Failed to write metadata for $uniqueBaseName", e)
+                throw StorageIOException("Failed to write metadata for $uniqueInternalName", e)
             }
         }
 
         if (metaSaveResult is Result.Error) {
+            Log.e(Constants.APP_TAG, "Metadata saving failed for $uniqueInternalName", metaSaveResult.exception)
             encryptedFile.delete()
             return@withContext Result.Error(metaSaveResult.exception)
         }
 
         val savedMediaFile = MediaFile(
-            fileName = uniqueBaseName,
+            fileName = uniqueInternalName,
             mediaType = mediaType,
             createdAtTimestampMillis = timestamp,
             sizeBytes = metadata.originalSizeBytes
@@ -152,6 +244,8 @@ class SecureMediaRepositoryImpl @Inject constructor(
         refreshMediaFileList()
         Result.Success(savedMediaFile)
     }
+
+
 
     override suspend fun getDecryptedMediaData(fileName: String): Result<ByteArray> =
         withContext(Dispatchers.IO) {

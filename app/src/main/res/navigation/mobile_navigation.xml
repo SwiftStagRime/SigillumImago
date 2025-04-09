@@ -52,4 +52,9 @@
             app:argType="string" />
         <deepLink app:uri="sigillum://app/photoDetail/{fileName}" />
     </fragment>
+    <fragment
+        android:id="@+id/navigation_recordings"
+        android:name="com.swifstagrime.feature_recordings.ui.fragments.recordings.RecordingsFragment"
+        android:label="RecordingsFragment"
+        tools:layout="@layout/fragment_recordings"/>
 </navigation>

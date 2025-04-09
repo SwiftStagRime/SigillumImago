@@ -61,4 +61,11 @@
     <string name="recording_saved">Recording saved: %1$s</string>
     <string name="recording_error">Error: %1$s</string>
     <string name="default_recording_name">Recording</string>
+
+
+    <string name="no_recordings_found">No recordings found.</string>
+    <string name="dialog_delete_title">Delete Recording?</string>
+    <string name="dialog_delete_message">Are you sure you want to delete \n\"%1$s\"?</string> <!-- Placeholder for filename -->
+    <string name="delete">Delete</string>
+    <string name="recording_details_format">%1$s | %2$s</string>
 </resources>
