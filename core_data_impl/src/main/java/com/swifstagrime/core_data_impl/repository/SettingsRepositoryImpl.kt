@@ -1,11 +1,11 @@
-package com.swifstagrime.feature_settings.data.repositories
+package com.swifstagrime.core_data_impl.repository
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.provider.Settings.Global.putString
-import com.swifstagrime.feature_settings.domain.models.AppTheme
-import com.swifstagrime.feature_settings.domain.models.LockMethod
-import com.swifstagrime.feature_settings.domain.repositories.SettingsRepository
+import androidx.core.content.edit
+import com.swifstagrime.core_common.model.AppTheme
+import com.swifstagrime.core_common.model.LockMethod
+import com.swifstagrime.core_data_api.repository.SettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import androidx.core.content.edit
 
 @Singleton
 class SettingsRepositoryImpl @Inject constructor(
@@ -40,7 +39,7 @@ class SettingsRepositoryImpl @Inject constructor(
         awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }.shareIn(
         scope = CoroutineScope(Dispatchers.IO),
-        started = SharingStarted.WhileSubscribed(),
+        started = SharingStarted.Companion.WhileSubscribed(),
         replay = 1
     )
 
@@ -57,7 +56,10 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     private fun getCurrentTheme(): AppTheme {
-        return AppTheme.valueOf(prefs.getString(KEY_APP_THEME, AppTheme.SYSTEM_DEFAULT.name) ?: AppTheme.SYSTEM_DEFAULT.name)
+        return AppTheme.valueOf(
+            prefs.getString(KEY_APP_THEME, AppTheme.SYSTEM_DEFAULT.name)
+                ?: AppTheme.SYSTEM_DEFAULT.name
+        )
     }
 
     override val lockMethod: Flow<LockMethod> = preferenceChangesFlow
@@ -73,12 +75,14 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setLockMethod(method: LockMethod) {
         withContext(Dispatchers.IO) {
-            prefs.edit{putString(KEY_LOCK_METHOD, method.name)}
+            prefs.edit { putString(KEY_LOCK_METHOD, method.name) }
         }
     }
 
     private fun getCurrentLockMethod(): LockMethod {
-        return LockMethod.valueOf(prefs.getString(KEY_LOCK_METHOD, LockMethod.NONE.name) ?: LockMethod.NONE.name)
+        return LockMethod.valueOf(
+            prefs.getString(KEY_LOCK_METHOD, LockMethod.NONE.name) ?: LockMethod.NONE.name
+        )
     }
 
 

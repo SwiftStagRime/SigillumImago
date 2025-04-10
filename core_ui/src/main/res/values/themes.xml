@@ -18,6 +18,7 @@
         <item name="android:statusBarColor">@color/white</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="materialAlertDialogTheme">@style/AppTheme.Dialog.Rounded</item>
+        <item name="preferenceTheme">@style/AppTheme.PreferenceThemeOverlay</item>
     </style>
 
     <style name="AppShapeAppearance.Dialog.Rounded" parent="ShapeAppearance.MaterialComponents.MediumComponent">
@@ -37,6 +38,14 @@
         <item name="shapeAppearanceMediumComponent">@style/AppShapeAppearance.Dialog.Rounded</item>
         <item name="buttonBarPositiveButtonStyle">@style/AppTheme.Dialog.Button.Positive</item>
         <item name="buttonBarNegativeButtonStyle">@style/AppTheme.Dialog.Button.Negative</item>
+    </style>
+
+    <style name="AppTheme.AlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="alertDialogTheme">@style/AppTheme.Dialog.Rounded</item>
+    </style>
+
+    <style name="AppTheme.PreferenceThemeOverlay" parent="PreferenceThemeOverlay">
+        <item name="android:tint">?colorOnPrimary</item>
     </style>
 </resources>
 

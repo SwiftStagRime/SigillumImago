@@ -18,4 +18,5 @@ interface SecureMediaRepository {
     suspend fun getMediaFile(fileName: String): Result<MediaFile>
     suspend fun deleteAllMedia(): Result<Unit>
     suspend fun getDecryptedDisplayName(internalFileName: String): Result<String?>
+    suspend fun getTotalUsedStorageBytes(): Result<Long>
 }

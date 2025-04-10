@@ -188,7 +188,10 @@ class RecordingsFragment : BaseFragment<FragmentRecordingsBinding>() {
     }
 
     private fun showDeleteConfirmationDialog(fileName: String) {
-        MaterialAlertDialogBuilder(requireContext(), com.swifstagrime.core_ui.R.style.AppTheme_Dialog_Rounded)
+        MaterialAlertDialogBuilder(
+            requireContext(),
+            com.swifstagrime.core_ui.R.style.AppTheme_Dialog_Rounded
+        )
             .setTitle(com.swifstagrime.core_ui.R.string.dialog_delete_title)
             .setMessage(
                 getString(

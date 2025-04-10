@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.swifstagrime.core_ui.R
 import com.swifstagrime.feature_auth.databinding.ActivityAuthBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -76,7 +77,7 @@ class AuthActivity : AppCompatActivity() {
         val authMode = intent.getStringExtra(EXTRA_AUTH_MODE) ?: AUTH_MODE_VERIFY
 
         if (authMode == AUTH_MODE_SETUP_OR_CHANGE) {
-            viewModel.startPinSetupFlow()
+            viewModel.startPinSetupOrChangeFlow()
         }
     }
 
@@ -117,9 +118,10 @@ class AuthActivity : AppCompatActivity() {
                     }
                 }
                 launch {
-                    viewModel.isBiometricAvailable.collect { available ->
+                    viewModel.isBiometricAuthOptionAvailable.collect { available ->
                         binding.buttonBiometric.visibility =
-                            if (available) View.VISIBLE else View.GONE
+                            if (available) View.VISIBLE else View.INVISIBLE
+                        binding.buttonBiometric.isEnabled = available
                     }
                 }
             }
@@ -127,18 +129,26 @@ class AuthActivity : AppCompatActivity() {
     }
 
     private fun updateUiForState(state: AuthState) {
-        val isSetup = when (state) {
-            is AuthState.Setup_PromptPin, is AuthState.Setup_EnteringPin,
-            is AuthState.Setup_PromptConfirmPin, is AuthState.Setup_EnteringConfirmPin,
-            is AuthState.Setup_SavingPin, is AuthState.Setup_Success,
-            is AuthState.Setup_Error -> true
+        val isSetupOrChange = when (state) {
+            is AuthState.SetupPromptPin, is AuthState.SetupEnteringPin,
+            is AuthState.SetupPromptConfirmPin, is AuthState.SetupEnteringConfirmPin,
+            is AuthState.SetupSavingPin, is AuthState.SetupSuccess,
+            is AuthState.SetupError,
+            is AuthState.ChangePromptCurrentPin, is AuthState.ChangeEnteringCurrentPin,
+            is AuthState.ChangeVerifyingCurrentPin -> true
 
             else -> false
         }
 
-        setPinPadEnabled(!state.let { it is AuthState.VerifyingPin || it is AuthState.Setup_SavingPin || it is AuthState.PromptBiometric })
-        binding.buttonBiometric.isEnabled =
-            !isSetup && viewModel.isBiometricAvailable.value && state !is AuthState.VerifyingPin
+        val isPinPadEnabled = when (state) {
+            is AuthState.VerifyingPin,
+            is AuthState.SetupSavingPin,
+            is AuthState.PromptBiometric,
+            is AuthState.ChangeVerifyingCurrentPin -> false
+
+            else -> true
+        }
+        setPinPadEnabled(isPinPadEnabled)
 
         when (state) {
             is AuthState.Idle -> {
@@ -152,17 +162,16 @@ class AuthActivity : AppCompatActivity() {
             }
 
             is AuthState.PinEntry -> {
-                binding.statusTextView.text =
-                    getString(com.swifstagrime.core_ui.R.string.auth_enter_pin)
+                binding.statusTextView.text = getString(R.string.auth_enter_pin)
                 updatePinDots(state.enteredDigits)
             }
 
             is AuthState.VerifyingPin -> {
-                binding.statusTextView.text =
-                    getString(com.swifstagrime.core_ui.R.string.verifying_pin)
+                binding.statusTextView.text = getString(R.string.verifying_pin)
             }
 
             is AuthState.PromptBiometric -> {
+                binding.statusTextView.text = getString(R.string.auth_use_biometrics)
                 if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
                     biometricPrompt.authenticate(promptInfo)
                 }
@@ -176,57 +185,53 @@ class AuthActivity : AppCompatActivity() {
             is AuthState.Error -> {
                 binding.statusTextView.text =
                     getString(state.messageResId, *(state.args?.toTypedArray() ?: emptyArray()))
-                binding.statusTextView.setTextColor(
-                    ContextCompat.getColor(
-                        this,
-                        com.swifstagrime.core_ui.R.color.error_light
-                    )
-                )
                 resetPinDots()
             }
 
-            is AuthState.Setup_PromptPin -> {
-                binding.statusTextView.text =
-                    getString(com.swifstagrime.core_ui.R.string.auth_pin_setup_prompt)
-                resetPinDots()
-            }
-
-            is AuthState.Setup_EnteringPin -> {
-                binding.statusTextView.text =
-                    getString(com.swifstagrime.core_ui.R.string.auth_pin_setup_prompt)
-                updatePinDots(state.enteredDigits)
-            }
-
-            is AuthState.Setup_PromptConfirmPin -> {
-                binding.statusTextView.text =
-                    getString(com.swifstagrime.core_ui.R.string.auth_pin_confirm_prompt)
-                resetPinDots()
-            }
-
-            is AuthState.Setup_EnteringConfirmPin -> {
-                binding.statusTextView.text =
-                    getString(com.swifstagrime.core_ui.R.string.auth_pin_confirm_prompt)
-                updatePinDots(state.enteredDigits)
-            }
-
-            is AuthState.Setup_SavingPin -> {
-                binding.statusTextView.text =
-                    getString(com.swifstagrime.core_ui.R.string.auth_pin_saving)
-            }
-
-            is AuthState.Setup_Success -> {
-                binding.statusTextView.text =
-                    getString(com.swifstagrime.core_ui.R.string.auth_pin_set_success)
-            }
-
-            is AuthState.Setup_Error -> {
+            is AuthState.ChangePromptCurrentPin -> {
                 binding.statusTextView.text = getString(state.messageResId)
-                binding.statusTextView.setTextColor(
-                    ContextCompat.getColor(
-                        this,
-                        com.swifstagrime.core_ui.R.color.error_light
-                    )
-                )
+                resetPinDots()
+            }
+
+            is AuthState.ChangeEnteringCurrentPin -> {
+                binding.statusTextView.text = getString(R.string.auth_enter_pin)
+                updatePinDots(state.enteredDigits)
+            }
+
+            is AuthState.ChangeVerifyingCurrentPin -> {
+                binding.statusTextView.text = getString(R.string.verifying_pin)
+            }
+
+            is AuthState.SetupPromptPin -> {
+                binding.statusTextView.text = getString(R.string.auth_pin_setup_prompt)
+                resetPinDots()
+            }
+
+            is AuthState.SetupEnteringPin -> {
+                binding.statusTextView.text = getString(R.string.auth_pin_setup_prompt)
+                updatePinDots(state.enteredDigits)
+            }
+
+            is AuthState.SetupPromptConfirmPin -> {
+                binding.statusTextView.text = getString(R.string.auth_pin_confirm_prompt)
+                resetPinDots()
+            }
+
+            is AuthState.SetupEnteringConfirmPin -> {
+                binding.statusTextView.text = getString(R.string.auth_pin_confirm_prompt)
+                updatePinDots(state.enteredDigits)
+            }
+
+            is AuthState.SetupSavingPin -> {
+                binding.statusTextView.text = getString(R.string.auth_pin_saving)
+            }
+
+            is AuthState.SetupSuccess -> {
+                binding.statusTextView.text = getString(R.string.auth_pin_set_success)
+            }
+
+            is AuthState.SetupError -> {
+                binding.statusTextView.text = getString(state.messageResId)
                 resetPinDots()
             }
 

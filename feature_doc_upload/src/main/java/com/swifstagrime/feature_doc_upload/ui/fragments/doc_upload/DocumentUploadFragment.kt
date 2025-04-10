@@ -1,15 +1,13 @@
 package com.swifstagrime.feature_doc_upload.ui.fragments.doc_upload
 
-import androidx.fragment.app.viewModels
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.hannesdorfmann.adapterdelegates4.ListDelegationAdapter
 import com.swifstagrime.core_common.constants.Constants
-import com.swifstagrime.core_ui.ui.fragments.BaseFragment
 import com.swifstagrime.core_ui.R
+import com.swifstagrime.core_ui.ui.fragments.BaseFragment
 import com.swifstagrime.feature_doc_upload.databinding.FragmentDocumentUploadBinding
 import com.swifstagrime.feature_doc_upload.domain.models.SelectedDocument
 import com.swifstagrime.feature_doc_upload.ui.delegates.selectedDocumentItemAdapterDelegate
@@ -95,7 +93,8 @@ class DocumentUploadFragment : BaseFragment<FragmentDocumentUploadBinding>() {
     private fun handleUiState(state: DocumentUploadUiState) {
 
         binding.promptCardView.isVisible = state is DocumentUploadUiState.Idle
-        binding.selectedFilesCardView.isVisible = state is DocumentUploadUiState.FilesSelected || state is DocumentUploadUiState.Uploading
+        binding.selectedFilesCardView.isVisible =
+            state is DocumentUploadUiState.FilesSelected || state is DocumentUploadUiState.Uploading
         binding.uploadProgressBar.isVisible = state is DocumentUploadUiState.Uploading
         binding.uploadStatusTextView.isVisible = state is DocumentUploadUiState.Uploading
         binding.errorTextView.isVisible = state is DocumentUploadUiState.Error
@@ -105,10 +104,12 @@ class DocumentUploadFragment : BaseFragment<FragmentDocumentUploadBinding>() {
         when (state) {
             is DocumentUploadUiState.Idle -> {
             }
+
             is DocumentUploadUiState.FilesSelected -> {
                 selectedFilesAdapter.items = state.documents
                 selectedFilesAdapter.notifyDataSetChanged()
             }
+
             is DocumentUploadUiState.Uploading -> {
 
                 binding.uploadProgressBar.progress = state.progress.overallProgressPercent
@@ -125,6 +126,7 @@ class DocumentUploadFragment : BaseFragment<FragmentDocumentUploadBinding>() {
                     etaString
                 )
             }
+
             is DocumentUploadUiState.Error -> {
                 binding.errorTextView.text = state.message
             }
@@ -142,9 +144,11 @@ class DocumentUploadFragment : BaseFragment<FragmentDocumentUploadBinding>() {
                     showSnackbar(getString(R.string.error_launching_file_picker))
                 }
             }
+
             is UiEvent.ShowUploadComplete -> {
                 showSnackbar(getString(R.string.upload_complete))
             }
+
             is UiEvent.ShowErrorSnackbar -> {
                 showSnackbar(event.message)
             }

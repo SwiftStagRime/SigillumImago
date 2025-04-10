@@ -2,16 +2,13 @@ package com.swifstagrime.feature_documents.ui.fragments.documents
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import androidx.fragment.app.viewModels
-import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -82,7 +79,8 @@ class DocumentsFragment : BaseFragment<FragmentDocumentsBinding>() {
     private fun handleListState(state: DocumentsListState) {
         binding.loadingProgressBar.isVisible = state is DocumentsListState.Loading
         binding.documentsRecyclerView.isVisible = state is DocumentsListState.Success
-        binding.statusTextView.isVisible = state is DocumentsListState.Error || (state is DocumentsListState.Success && state.documents.isEmpty())
+        binding.statusTextView.isVisible =
+            state is DocumentsListState.Error || (state is DocumentsListState.Success && state.documents.isEmpty())
 
         when (state) {
             is DocumentsListState.Success -> {
@@ -92,9 +90,11 @@ class DocumentsFragment : BaseFragment<FragmentDocumentsBinding>() {
                     binding.statusTextView.text = getString(R.string.no_documents_found)
                 }
             }
+
             is DocumentsListState.Error -> {
                 binding.statusTextView.text = state.message
             }
+
             DocumentsListState.Loading -> {}
         }
     }
@@ -104,18 +104,22 @@ class DocumentsFragment : BaseFragment<FragmentDocumentsBinding>() {
             is UiEvent.ShowDeleteConfirmation -> {
                 showDeleteConfirmationDialog(event.internalFileName, event.displayName)
             }
+
             is UiEvent.PrepareToOpenFile -> {
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                     openFileExternally(event.decryptedData, event.originalDisplayName)
                 }
             }
+
             is UiEvent.ShowError -> {
                 showSnackbar(event.message)
                 binding.loadingOverlay.isVisible = false
             }
+
             is UiEvent.ShowLoadingIndicator -> {
                 binding.loadingOverlay.isVisible = true
             }
+
             is UiEvent.HideLoadingIndicator -> {
                 binding.loadingOverlay.isVisible = false
             }
@@ -123,7 +127,10 @@ class DocumentsFragment : BaseFragment<FragmentDocumentsBinding>() {
     }
 
     private fun showDeleteConfirmationDialog(internalFileName: String, displayName: String) {
-        MaterialAlertDialogBuilder(requireContext(), com.swifstagrime.core_ui.R.style.AppTheme_Dialog_Rounded)
+        MaterialAlertDialogBuilder(
+            requireContext(),
+            com.swifstagrime.core_ui.R.style.AppTheme_Dialog_Rounded
+        )
             .setTitle(R.string.dialog_delete_title)
             .setMessage(getString(R.string.dialog_delete_message_doc, displayName))
             .setNegativeButton(R.string.cancel, null)
@@ -143,7 +150,8 @@ class DocumentsFragment : BaseFragment<FragmentDocumentsBinding>() {
         val cachePath = File(context.cacheDir, "temp_docs/")
         cachePath.mkdirs()
 
-        val safeFilename = suggestedFilename.replace(Regex("[^a-zA-Z0-9._-]"), "_").ifBlank { "temp_document" }
+        val safeFilename =
+            suggestedFilename.replace(Regex("[^a-zA-Z0-9._-]"), "_").ifBlank { "temp_document" }
         val tempFile = File(cachePath, safeFilename)
 
         try {
@@ -184,7 +192,11 @@ class DocumentsFragment : BaseFragment<FragmentDocumentsBinding>() {
                 showSnackbar(getString(R.string.error_creating_temp_file))
             }
         } catch (e: IllegalArgumentException) {
-            Log.e(Constants.APP_TAG, "IllegalArgumentException getting FileProvider URI. Check authority/paths.xml", e)
+            Log.e(
+                Constants.APP_TAG,
+                "IllegalArgumentException getting FileProvider URI. Check authority/paths.xml",
+                e
+            )
             withContext(Dispatchers.Main) {
                 showSnackbar(getString(R.string.error_opening_file_provider))
             }
@@ -197,7 +209,9 @@ class DocumentsFragment : BaseFragment<FragmentDocumentsBinding>() {
 
     private fun getMimeType(fileName: String): String? {
         val extension = MimeTypeMap.getFileExtensionFromUrl(fileName)
-        return extension?.let { MimeTypeMap.getSingleton().getMimeTypeFromExtension(it.lowercase()) }
+        return extension?.let {
+            MimeTypeMap.getSingleton().getMimeTypeFromExtension(it.lowercase())
+        }
     }
 
 }

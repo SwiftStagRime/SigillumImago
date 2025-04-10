@@ -4,12 +4,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import com.swifstagrime.core_ui.R
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,12 +17,12 @@ import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.swifstagrime.core_common.constants.Constants
+import com.swifstagrime.core_common.model.AppTheme
+import com.swifstagrime.core_common.model.LockMethod
+import com.swifstagrime.core_ui.R
 import com.swifstagrime.feature_auth.ui.activities.AuthActivity
-import com.swifstagrime.feature_settings.domain.models.AppTheme
-import com.swifstagrime.feature_settings.domain.models.LockMethod
 import com.swifstagrime.feature_settings.ui.fragments.settings.SettingsViewModel.BiometricSupportStatus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -128,7 +124,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
                 launch {
                     viewModel.isAppLockEnabled.collect { isEnabled ->
-                        findPreference<SwitchPreferenceCompat>(keyEnableAppLock)?.isChecked = isEnabled
+                        findPreference<SwitchPreferenceCompat>(keyEnableAppLock)?.isChecked =
+                            isEnabled
                         findPreference<ListPreference>(keyLockMethod)?.isVisible = isEnabled
                         findPreference<Preference>(keySetPin)?.isVisible = isEnabled
                     }
@@ -137,9 +134,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 launch {
                     viewModel.isPinSet.collect { isSet ->
                         findPreference<Preference>(keySetPin)?.apply {
-                            title = if(isSet) getString(R.string.settings_title_change_pin) else getString(R.string.settings_title_set_pin)
-                            summary = if(isSet) getString(R.string.settings_summary_change_pin) else getString(R.string.settings_summary_set_pin_new)
+                            title =
+                                if (isSet) getString(R.string.settings_title_change_pin) else getString(
+                                    R.string.settings_title_set_pin
+                                )
+                            summary =
+                                if (isSet) getString(R.string.settings_summary_change_pin) else getString(
+                                    R.string.settings_summary_set_pin_new
+                                )
                         }
+                    }
+                }
+
+                launch {
+                    viewModel.storageUsageState.collect { state ->
+                        updateStorageUsageSummary(state)
                     }
                 }
 
@@ -176,6 +185,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
         startActivity(intent)
     }
 
+    private fun updateStorageUsageSummary(state: StorageUsageState) {
+        val summary = when (state) {
+            is StorageUsageState.Calculating -> getString(R.string.settings_summary_storage_calculating)
+            is StorageUsageState.Calculated -> state.formattedSize
+            is StorageUsageState.Error -> getString(R.string.settings_summary_storage_error)
+        }
+        findPreference<Preference>(keyStorageUsage)?.summary = summary
+    }
+
+
     private fun updateLockMethodPreference(method: LockMethod, bioStatus: BiometricSupportStatus) {
         val lockMethodPref = findPreference<ListPreference>(keyLockMethod)
         val setPinPref = findPreference<Preference>(keySetPin)
@@ -187,8 +206,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         if (isLockEnabled) {
             lockMethodPref?.value = method.name
 
-            val entries = resources.getStringArray(com.swifstagrime.feature_settings.R.array.lock_method_entries).toMutableList()
-            val entryValues = resources.getStringArray(com.swifstagrime.feature_settings.R.array.lock_method_values).toMutableList()
+            val entries =
+                resources.getStringArray(com.swifstagrime.feature_settings.R.array.lock_method_entries)
+                    .toMutableList()
+            val entryValues =
+                resources.getStringArray(com.swifstagrime.feature_settings.R.array.lock_method_values)
+                    .toMutableList()
 
             val biometricValue = LockMethod.BIOMETRIC.name
             val biometricIndex = entryValues.indexOf(biometricValue)
@@ -217,9 +240,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun handleClearDataState(state: ClearDataState) {
         when (state) {
             ClearDataState.Clearing -> showToast(getString(R.string.clearing_data))
-            ClearDataState.Success -> { }
-            is ClearDataState.Error -> { }
-            ClearDataState.Idle -> { }
+            ClearDataState.Success -> {}
+            is ClearDataState.Error -> {}
+            ClearDataState.Idle -> {}
         }
     }
 
@@ -236,7 +259,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun updateVersionSummary() {
         try {
-            val packageInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
+            val packageInfo =
+                requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             val version = packageInfo.versionName
             findPreference<Preference>(keyVersion)?.summary = version
         } catch (e: PackageManager.NameNotFoundException) {
@@ -248,6 +272,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
+
     private fun showSnackbar(message: String) {
         view?.let { Snackbar.make(it, message, Snackbar.LENGTH_LONG).show() }
     }

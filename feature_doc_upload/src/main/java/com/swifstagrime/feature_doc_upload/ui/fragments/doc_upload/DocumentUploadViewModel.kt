@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swifstagrime.core_common.constants.Constants
 import com.swifstagrime.core_common.model.MediaType
+import com.swifstagrime.core_common.utils.Result
 import com.swifstagrime.core_data_api.repository.SecureMediaRepository
 import com.swifstagrime.feature_doc_upload.domain.models.SelectedDocument
-import com.swifstagrime.core_common.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +46,7 @@ sealed interface DocumentUploadUiState {
         val documents: List<SelectedDocument>,
         val progress: UploadProgressState.Processing
     ) : DocumentUploadUiState
+
     data class Error(val message: String) : DocumentUploadUiState
 }
 
@@ -79,7 +80,8 @@ class DocumentUploadViewModel @Inject constructor(
         if (uris.isEmpty()) return
 
         viewModelScope.launch(Dispatchers.IO) {
-            val currentDocs = (_uiState.value as? DocumentUploadUiState.FilesSelected)?.documents ?: emptyList()
+            val currentDocs =
+                (_uiState.value as? DocumentUploadUiState.FilesSelected)?.documents ?: emptyList()
             val newDocs = mutableListOf<SelectedDocument>()
 
             uris.forEach { uri ->
@@ -89,19 +91,35 @@ class DocumentUploadViewModel @Inject constructor(
                             val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                             val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
 
-                            val name = if (nameIndex != -1) cursor.getString(nameIndex) else "unknown_file_${System.currentTimeMillis()}"
+                            val name =
+                                if (nameIndex != -1) cursor.getString(nameIndex) else "unknown_file_${System.currentTimeMillis()}"
                             val size = if (sizeIndex != -1) cursor.getLong(sizeIndex) else -1L
 
                             if (size != 0L) {
-                                newDocs.add(SelectedDocument(uri = uri, fileName = name, sizeBytes = size))
-                                Log.d(Constants.APP_TAG, "Processed URI: $uri, Name: $name, Size: $size")
+                                newDocs.add(
+                                    SelectedDocument(
+                                        uri = uri,
+                                        fileName = name,
+                                        sizeBytes = size
+                                    )
+                                )
+                                Log.d(
+                                    Constants.APP_TAG,
+                                    "Processed URI: $uri, Name: $name, Size: $size"
+                                )
                             } else {
-                                Log.w(Constants.APP_TAG, "Skipping URI with size 0 or invalid: $uri")
+                                Log.w(
+                                    Constants.APP_TAG,
+                                    "Skipping URI with size 0 or invalid: $uri"
+                                )
                             }
                         } else {
                             Log.w(Constants.APP_TAG, "Could not moveToFirst for URI: $uri")
                         }
-                    } ?: Log.w(Constants.APP_TAG, "ContentResolver query returned null for URI: $uri")
+                    } ?: Log.w(
+                        Constants.APP_TAG,
+                        "ContentResolver query returned null for URI: $uri"
+                    )
                 } catch (e: Exception) {
                     Log.e(Constants.APP_TAG, "Error processing URI: $uri", e)
                 }
@@ -147,10 +165,16 @@ class DocumentUploadViewModel @Inject constructor(
             val startTime = System.currentTimeMillis()
             var firstFileFailed = false
 
-            withContext(Dispatchers.Main.immediate){
+            withContext(Dispatchers.Main.immediate) {
                 _uiState.value = DocumentUploadUiState.Uploading(
                     documentsToUpload,
-                    UploadProgressState.Processing(0, totalFiles, documentsToUpload.firstOrNull()?.fileName ?: "", 0, null)
+                    UploadProgressState.Processing(
+                        0,
+                        totalFiles,
+                        documentsToUpload.firstOrNull()?.fileName ?: "",
+                        0,
+                        null
+                    )
                 )
             }
 
@@ -171,7 +195,10 @@ class DocumentUploadViewModel @Inject constructor(
                             )
                         )
                     } else {
-                        Log.w(Constants.APP_TAG, "Upload state changed during progress update, cancelling.")
+                        Log.w(
+                            Constants.APP_TAG,
+                            "Upload state changed during progress update, cancelling."
+                        )
                         this@launch.cancel()
                     }
                 }
@@ -191,9 +218,13 @@ class DocumentUploadViewModel @Inject constructor(
                 }
 
                 if (fileBytes == null) {
-                    Log.e(Constants.APP_TAG, "Stopping upload due to read error for ${doc.fileName}")
-                    withContext(Dispatchers.Main.immediate){
-                        _uiState.value = DocumentUploadUiState.Error("Failed to read file: ${doc.fileName}")
+                    Log.e(
+                        Constants.APP_TAG,
+                        "Stopping upload due to read error for ${doc.fileName}"
+                    )
+                    withContext(Dispatchers.Main.immediate) {
+                        _uiState.value =
+                            DocumentUploadUiState.Error("Failed to read file: ${doc.fileName}")
                         _uiEvents.emit(UiEvent.ShowErrorSnackbar("Error reading ${doc.fileName}"))
                     }
                     firstFileFailed = true
@@ -207,9 +238,14 @@ class DocumentUploadViewModel @Inject constructor(
                 )
 
                 if (saveResult is Result.Error) {
-                    Log.e(Constants.APP_TAG, "Failed to save file: ${doc.fileName}", saveResult.exception)
+                    Log.e(
+                        Constants.APP_TAG,
+                        "Failed to save file: ${doc.fileName}",
+                        saveResult.exception
+                    )
                     withContext(Dispatchers.Main.immediate) {
-                        _uiState.value = DocumentUploadUiState.Error("Failed to save file: ${doc.fileName}")
+                        _uiState.value =
+                            DocumentUploadUiState.Error("Failed to save file: ${doc.fileName}")
                         _uiEvents.emit(UiEvent.ShowErrorSnackbar("Error saving ${doc.fileName}"))
                     }
                     firstFileFailed = true
@@ -237,7 +273,11 @@ class DocumentUploadViewModel @Inject constructor(
         }
     }
 
-    private fun calculateEstimatedTime(startTimeMs: Long, processedCount: Int, totalCount: Int): Long? {
+    private fun calculateEstimatedTime(
+        startTimeMs: Long,
+        processedCount: Int,
+        totalCount: Int
+    ): Long? {
         if (processedCount <= 0 || totalCount <= processedCount) {
             return null
         }

@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swifstagrime.core_common.constants.Constants
 import com.swifstagrime.core_common.model.MediaType
-import com.swifstagrime.core_data_api.model.MediaFile
 import com.swifstagrime.core_common.utils.Result
+import com.swifstagrime.core_data_api.model.MediaFile
 import com.swifstagrime.core_data_api.repository.SecureMediaRepository
 import com.swifstagrime.feature_documents.domain.models.DocumentDisplayInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +40,9 @@ sealed interface DocumentsListState {
 }
 
 sealed interface UiEvent {
-    data class ShowDeleteConfirmation(val internalFileName: String, val displayName: String) : UiEvent
+    data class ShowDeleteConfirmation(val internalFileName: String, val displayName: String) :
+        UiEvent
+
     data class PrepareToOpenFile(
         val decryptedData: ByteArray,
         val originalDisplayName: String
@@ -100,14 +102,18 @@ class DocumentsViewModel @Inject constructor(
                 .catch { e ->
                     Log.e(Constants.APP_TAG, "Error in documents flow", e)
                     withContext(Dispatchers.Main.immediate) {
-                        _listState.value = DocumentsListState.Error("Failed to load documents: ${e.message}")
+                        _listState.value =
+                            DocumentsListState.Error("Failed to load documents: ${e.message}")
                     }
                     emit(emptyList())
                 }
                 .flowOn(Dispatchers.Default)
                 .collectLatest { displayInfos ->
                     withContext(Dispatchers.Main.immediate) {
-                        Log.d(Constants.APP_TAG, "Updating document list state with ${displayInfos.size} items.")
+                        Log.d(
+                            Constants.APP_TAG,
+                            "Updating document list state with ${displayInfos.size} items."
+                        )
                         _listState.value = DocumentsListState.Success(displayInfos)
                     }
                 }
@@ -124,11 +130,16 @@ class DocumentsViewModel @Inject constructor(
         val displayInfos = coroutineScope {
             documentFiles.map { mediaFile ->
                 async(Dispatchers.IO) {
-                    val nameResult = secureMediaRepository.getDecryptedDisplayName(mediaFile.fileName)
+                    val nameResult =
+                        secureMediaRepository.getDecryptedDisplayName(mediaFile.fileName)
                     val displayName = when (nameResult) {
                         is Result.Success -> nameResult.data ?: mediaFile.fileName
                         is Result.Error -> {
-                            Log.e(Constants.APP_TAG, "Failed get display name for ${mediaFile.fileName}", nameResult.exception)
+                            Log.e(
+                                Constants.APP_TAG,
+                                "Failed get display name for ${mediaFile.fileName}",
+                                nameResult.exception
+                            )
                             mediaFile.fileName
                         }
                     }
@@ -162,8 +173,13 @@ class DocumentsViewModel @Inject constructor(
                         )
                     )
                 }
+
                 is Result.Error -> {
-                    Log.e(Constants.APP_TAG, "Failed to decrypt document: ${docInfo.internalFileName}", decryptResult.exception)
+                    Log.e(
+                        Constants.APP_TAG,
+                        "Failed to decrypt document: ${docInfo.internalFileName}",
+                        decryptResult.exception
+                    )
                     _uiEvents.emit(UiEvent.ShowError("Failed to open '${docInfo.displayName}': Decryption error."))
                 }
             }
@@ -173,7 +189,12 @@ class DocumentsViewModel @Inject constructor(
 
     fun onDeleteClicked(docInfo: DocumentDisplayInfo) {
         viewModelScope.launch {
-            _uiEvents.emit(UiEvent.ShowDeleteConfirmation(docInfo.internalFileName, docInfo.displayName))
+            _uiEvents.emit(
+                UiEvent.ShowDeleteConfirmation(
+                    docInfo.internalFileName,
+                    docInfo.displayName
+                )
+            )
         }
     }
 
@@ -188,8 +209,13 @@ class DocumentsViewModel @Inject constructor(
                 is Result.Success -> {
                     Log.i(Constants.APP_TAG, "Successfully deleted document: $internalFileName")
                 }
+
                 is Result.Error -> {
-                    Log.e(Constants.APP_TAG, "Failed to delete document: $internalFileName", result.exception)
+                    Log.e(
+                        Constants.APP_TAG,
+                        "Failed to delete document: $internalFileName",
+                        result.exception
+                    )
                     withContext(Dispatchers.Main.immediate) {
                         _uiEvents.emit(UiEvent.ShowError("Failed to delete document: ${result.exception.message}"))
                     }

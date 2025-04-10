@@ -48,6 +48,8 @@ dependencies {
     //Project modules
     implementation(project(":core_ui"))
     implementation(project(":core_common"))
+    implementation(project(":core_data_api"))
+    implementation(project(":core_data_impl"))
     implementation(project(":feature_auth"))
     implementation(project(":feature_camera"))
     implementation(project(":feature_gallery"))
@@ -68,6 +70,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)
+    implementation(libs.androidx.lifecycle.process)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -89,7 +89,10 @@ class SecureMediaRepositoryImpl @Inject constructor(
 
             val timestamp = internalFileName.substringBefore('_').toLongOrNull()
             if (timestamp == null) {
-                Log.w(Constants.APP_TAG, "Could not parse timestamp from filename: $internalFileName")
+                Log.w(
+                    Constants.APP_TAG,
+                    "Could not parse timestamp from filename: $internalFileName"
+                )
                 return null
             }
 
@@ -210,7 +213,11 @@ class SecureMediaRepositoryImpl @Inject constructor(
                 null
             }
         } catch (e: Exception) {
-            Log.e(Constants.APP_TAG, "Failed to encrypt desired filename, proceeding without it.", e)
+            Log.e(
+                Constants.APP_TAG,
+                "Failed to encrypt desired filename, proceeding without it.",
+                e
+            )
             null
         }
 
@@ -229,7 +236,11 @@ class SecureMediaRepositoryImpl @Inject constructor(
         }
 
         if (metaSaveResult is Result.Error) {
-            Log.e(Constants.APP_TAG, "Metadata saving failed for $uniqueInternalName", metaSaveResult.exception)
+            Log.e(
+                Constants.APP_TAG,
+                "Metadata saving failed for $uniqueInternalName",
+                metaSaveResult.exception
+            )
             encryptedFile.delete()
             return@withContext Result.Error(metaSaveResult.exception)
         }
@@ -244,7 +255,6 @@ class SecureMediaRepositoryImpl @Inject constructor(
         refreshMediaFileList()
         Result.Success(savedMediaFile)
     }
-
 
 
     override suspend fun getDecryptedMediaData(fileName: String): Result<ByteArray> =
@@ -338,6 +348,36 @@ class SecureMediaRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             refreshMediaFileList()
             Result.Error(StorageIOException("Error occurred during deleteAllMedia", e))
+        }
+    }
+
+    override suspend fun getTotalUsedStorageBytes(): Result<Long> {
+        return wrapResult {
+            withContext(Dispatchers.IO) {
+                var totalBytes = 0L
+                if (!secureDir.exists() || !secureDir.isDirectory) {
+                    return@withContext 0L
+                }
+
+                try {
+                    secureDir.listFiles()?.forEach { file ->
+                        if (file.isFile) {
+                            totalBytes += file.length()
+                        }
+                    }
+                } catch (e: SecurityException) {
+                    Log.e(
+                        Constants.APP_TAG,
+                        "SecurityException listing files for size calculation",
+                        e
+                    )
+                    throw StorageIOException("Permission denied while calculating storage usage", e)
+                } catch (e: Exception) {
+                    Log.e(Constants.APP_TAG, "Error calculating storage usage", e)
+                    throw StorageIOException("Failed to calculate storage usage", e)
+                }
+                totalBytes
+            }
         }
     }
 }

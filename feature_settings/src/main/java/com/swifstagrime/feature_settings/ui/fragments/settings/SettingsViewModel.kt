@@ -1,19 +1,20 @@
 package com.swifstagrime.feature_settings.ui.fragments.settings
 
 import android.content.Context
+import android.text.format.Formatter
+import android.util.Log
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
-import com.swifstagrime.core_common.utils.Result
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swifstagrime.core_common.constants.Constants
+import com.swifstagrime.core_common.model.AppTheme
+import com.swifstagrime.core_common.model.LockMethod
+import com.swifstagrime.core_common.utils.Result
 import com.swifstagrime.core_data_api.repository.AuthRepository
 import com.swifstagrime.core_data_api.repository.SecureMediaRepository
-import com.swifstagrime.feature_settings.domain.models.AppTheme
-import com.swifstagrime.feature_settings.domain.models.LockMethod
-import com.swifstagrime.feature_settings.domain.repositories.SettingsRepository
+import com.swifstagrime.core_data_api.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +45,12 @@ sealed interface UiEvent {
     data class ShowErrorSnackbar(val message: String) : UiEvent
 }
 
+sealed interface StorageUsageState {
+    object Calculating : StorageUsageState
+    data class Calculated(val formattedSize: String) : StorageUsageState
+    data class Error(val message: String) : StorageUsageState
+}
+
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -72,8 +79,13 @@ class SettingsViewModel @Inject constructor(
     private val _uiEvents = MutableSharedFlow<UiEvent>()
     val uiEvents: SharedFlow<UiEvent> = _uiEvents.asSharedFlow()
 
+    private val _storageUsageState =
+        MutableStateFlow<StorageUsageState>(StorageUsageState.Calculating)
+    val storageUsageState: StateFlow<StorageUsageState> = _storageUsageState.asStateFlow()
+
     init {
         checkBiometricSupport()
+        fetchStorageUsage()
     }
 
     fun onSetPinClicked() {
@@ -85,7 +97,8 @@ class SettingsViewModel @Inject constructor(
     private fun checkBiometricSupport() {
         viewModelScope.launch {
             val biometricManager = BiometricManager.from(context)
-            val canAuthenticate = biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+            val canAuthenticate =
+                biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
 
             _biometricStatus.value = when (canAuthenticate) {
                 BiometricManager.BIOMETRIC_SUCCESS -> BiometricSupportStatus.READY
@@ -135,6 +148,7 @@ class SettingsViewModel @Inject constructor(
                     _clearDataState.value = ClearDataState.Success
                     _uiEvents.emit(UiEvent.ShowToast("All secure data cleared."))
                 }
+
                 is Result.Error -> {
                     Log.e(Constants.APP_TAG, "Error clearing secure data", result.exception)
                     val errorMsg = "Failed to clear data: ${result.exception.message}"
@@ -144,6 +158,30 @@ class SettingsViewModel @Inject constructor(
             }
             delay(200)
             _clearDataState.value = ClearDataState.Idle
+        }
+    }
+
+    fun fetchStorageUsage() {
+        viewModelScope.launch {
+            _storageUsageState.value = StorageUsageState.Calculating
+            val result = secureMediaRepository.getTotalUsedStorageBytes()
+
+            when (result) {
+                is Result.Success -> {
+                    val formatted = Formatter.formatShortFileSize(context, result.data)
+                    _storageUsageState.value = StorageUsageState.Calculated(formatted)
+                    Log.d(
+                        Constants.APP_TAG,
+                        "Storage usage calculated: ${result.data} bytes ($formatted)"
+                    )
+                }
+
+                is Result.Error -> {
+                    Log.e(Constants.APP_TAG, "Failed to calculate storage usage", result.exception)
+                    val errorMsg = "Error calculating storage"
+                    _storageUsageState.value = StorageUsageState.Error(errorMsg)
+                }
+            }
         }
     }
 

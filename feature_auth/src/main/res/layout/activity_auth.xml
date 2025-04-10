@@ -33,7 +33,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleTextView"
-        tools:text="@string/auth_enter_your_pin" />
+        tools:text="@string/auth_enter_pin" />
 
     <LinearLayout
         android:id="@+id/pinDotsLayout"
@@ -156,8 +156,8 @@
                 style="@style/PinPadButton.Icon"
                 android:contentDescription="@string/auth_use_biometrics"
                 android:src="@drawable/ic_fingerprint"
-                android:tint="?attr/colorOnPrimary"
                 android:visibility="gone"
+                app:tint="?attr/colorOnPrimary"
                 tools:visibility="visible" />
 
             <Button
@@ -170,7 +170,7 @@
                 style="@style/PinPadButton.Icon"
                 android:contentDescription="@string/auth_backspace"
                 android:src="@drawable/ic_backspace"
-                android:tint="?attr/colorOnPrimary" />
+                app:tint="?attr/colorOnPrimary" />
         </LinearLayout>
 
     </LinearLayout>

@@ -1,4 +1,4 @@
-package com.swifstagrime.feature_settings.domain.models
+package com.swifstagrime.core_common.model
 
 enum class AppTheme {
     LIGHT, DARK, SYSTEM_DEFAULT

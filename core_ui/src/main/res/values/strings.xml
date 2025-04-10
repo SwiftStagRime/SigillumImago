@@ -135,6 +135,7 @@
     <string name="dialog_clear_data_message">This will permanently delete ALL secure photos, recordings, and documents stored in this app. This action cannot be undone.\n\nAre you absolutely sure?</string>
     <string name="clear">Clear</string>
     <string name="clearing_data">Clearing data…</string>
+    <string name="settings_summary_storage_error">Error calculating size</string>
 
     <string name="privacy_policy_url" translatable="false">https://github.com/SwiftStagRime/SigillumImago</string>
 

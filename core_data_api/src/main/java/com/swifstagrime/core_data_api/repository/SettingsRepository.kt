@@ -1,9 +1,8 @@
-package com.swifstagrime.feature_settings.domain.repositories
+package com.swifstagrime.core_data_api.repository
 
-import com.swifstagrime.feature_settings.domain.models.AppTheme
-import com.swifstagrime.feature_settings.domain.models.LockMethod
+import com.swifstagrime.core_common.model.AppTheme
+import com.swifstagrime.core_common.model.LockMethod
 import kotlinx.coroutines.flow.Flow
-
 
 interface SettingsRepository {
 
