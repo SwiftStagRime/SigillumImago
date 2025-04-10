@@ -11,6 +11,8 @@
     <string name="camera_permission_rationale">Camera access is needed to capture photos.</string>
     <string name="camera">Camera</string>
     <string name="recorder">Recorder</string>
+    <string name="clean_cache">Clean Cache</string>
+    <string name="cache_cleared">Cache cleared</string>
     <string name="documents">Document</string>
     <string name="welcome_sign">Stay\nSecure!</string>
     <string name="gallery_empty_message">No photos found.</string>
@@ -35,7 +37,7 @@
 
     <string name="auth_biometric_failed">Biometric authentication failed.</string>
     <string name="auth_generic_error">An error occurred. Please try again.</string>
-    <string name="verifying_pin">Verifying PIN…</string> <!-- Added -->
+    <string name="verifying_pin">Verifying PIN…</string>
 
     <string name="auth_pin_setup_prompt">Set a 5-digit PIN</string>
     <string name="auth_pin_confirm_prompt">Confirm your 5-digit PIN</string>
@@ -62,10 +64,36 @@
     <string name="recording_error">Error: %1$s</string>
     <string name="default_recording_name">Recording</string>
 
-
     <string name="no_recordings_found">No recordings found.</string>
     <string name="dialog_delete_title">Delete Recording?</string>
-    <string name="dialog_delete_message">Are you sure you want to delete \n\"%1$s\"?</string> <!-- Placeholder for filename -->
+    <string name="dialog_delete_message">Are you sure you want to delete \n\"%1$s\"?</string>
     <string name="delete">Delete</string>
     <string name="recording_details_format">%1$s | %2$s</string>
+
+    <string name="cd_add_documents_prompt_icon">Icon prompting to add documents</string>
+    <string name="prompt_select_documents">Tap to select documents to secure</string>
+    <string name="cd_add_more_documents">Add more documents</string>
+    <string name="upload_files_button">Upload File(s)</string>
+    <string name="cd_document_icon">Document icon</string>
+    <string name="cd_remove_document_from_list">Remove this document from the upload list</string>
+    <string name="unknown_size">Unknown size</string>
+    <string name="upload_status_format">Uploading %1$d of %2$d: %3$s (ETA: %4$s)</string>
+    <string name="eta_calculating">Calculating…</string>
+    <string name="eta_minutes_seconds">%1$d min %2$d sec</string>
+    <string name="eta_seconds">%1$d sec</string>
+    <string name="eta_less_than_second">&lt; 1 sec</string>
+    <string name="upload_complete">Upload finished successfully!</string>
+    <string name="error_launching_file_picker">Could not open file picker.</string>
+
+    <string name="cd_document_icon_item">Document icon</string>
+    <string name="cd_delete_document_item">Delete this document</string>
+
+    <string name="no_documents_found">No documents found.</string>
+    <string name="dialog_delete_message_doc">Are you sure you want to delete \n\"%1$s\"?</string> <!-- Specific message -->
+    <string name="error_no_app_found_to_open">No application found to open file type: %1$s</string>
+    <string name="error_opening_file_permission">Permission denied opening file.</string>
+    <string name="error_opening_file_provider">Error sharing file. Check app configuration.</string>
+    <string name="error_creating_temp_file">Error preparing file for viewing.</string>
+    <string name="document_details_format">%1$s | %2$s</string>
+
 </resources>

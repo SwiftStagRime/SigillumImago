@@ -40,10 +40,12 @@
     <color name="soft_green">#5AD05E</color>
     <color name="soft_red">#F05555</color>
     <color name="soft_blue">#5271F0</color>
+    <color name="soft_gold">#EACD6F</color>
 
     <color name="modern_teal">#36BBA5</color>
     <color name="modern_coral">#FF7070</color>
     <color name="modern_indigo">#6B6CF5</color>
+
 
     <color name="subtle_green">#70B073</color>
     <color name="subtle_red">#C96262</color>

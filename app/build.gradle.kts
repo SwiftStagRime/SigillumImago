@@ -47,6 +47,7 @@ dependencies {
 
     //Project modules
     implementation(project(":core_ui"))
+    implementation(project(":core_common"))
     implementation(project(":feature_auth"))
     implementation(project(":feature_camera"))
     implementation(project(":feature_gallery"))
@@ -54,6 +55,8 @@ dependencies {
     implementation(project(":feature_home"))
     implementation(project(":feature_recorder"))
     implementation(project(":feature_recordings"))
+    implementation(project(":feature_doc_upload"))
+    implementation(project(":feature_documents"))
 
     //Common
     implementation(libs.androidx.core.ktx)

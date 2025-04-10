@@ -18,6 +18,8 @@
             <option value="$PROJECT_DIR$/core_ui" />
             <option value="$PROJECT_DIR$/feature_auth" />
             <option value="$PROJECT_DIR$/feature_camera" />
+            <option value="$PROJECT_DIR$/feature_doc_upload" />
+            <option value="$PROJECT_DIR$/feature_documents" />
             <option value="$PROJECT_DIR$/feature_gallery" />
             <option value="$PROJECT_DIR$/feature_home" />
             <option value="$PROJECT_DIR$/feature_recorder" />

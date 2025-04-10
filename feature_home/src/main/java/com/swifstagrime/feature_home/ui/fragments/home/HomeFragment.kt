@@ -13,8 +13,11 @@ import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
+import com.swifstagrime.core_common.utils.CacheUtils
 import com.swifstagrime.core_ui.ui.fragments.BaseFragment
 import com.swifstagrime.feature_home.databinding.FragmentHomeBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -52,6 +55,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         binding.docsShortcut.setOnClickListener {
             navigateToDocuments()
         }
+
+        binding.cacheShortcut.setOnClickListener {
+            clearCache()
+        }
+    }
+
+    private fun clearCache() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            CacheUtils.clearInternalCacheDirectory(requireContext())
+        }
+        showSnackbar(getString(com.swifstagrime.core_ui.R.string.cache_cleared))
+    }
+
+    private fun showSnackbar(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun prepareWelcomeTextForAnimation() {
@@ -124,7 +142,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun navigateToSettings() {
-        findNavController().navigate("sigillum://app/settings".toUri())
+        //Not implemented yet!!!!!
+        //findNavController().navigate("sigillum://app/settings".toUri())
     }
 
     private fun navigateToCamera() {
@@ -136,7 +155,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun navigateToDocuments() {
-        findNavController().navigate("sigillum://app/documents".toUri())
+        findNavController().navigate("sigillum://app/docUpload".toUri())
     }
 
 

@@ -57,4 +57,15 @@
         android:name="com.swifstagrime.feature_recordings.ui.fragments.recordings.RecordingsFragment"
         android:label="RecordingsFragment"
         tools:layout="@layout/fragment_recordings"/>
+    <fragment
+        android:id="@+id/navigation_doc_upload"
+        android:name="com.swifstagrime.feature_doc_upload.ui.fragments.doc_upload.DocumentUploadFragment"
+        android:label="DocumentUploadFragment">
+        <deepLink app:uri="sigillum://app/docUpload"/>
+
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_documents"
+        android:name="com.swifstagrime.feature_documents.ui.fragments.documents.DocumentsFragment"
+        android:label="DocumentsFragment" />
 </navigation>

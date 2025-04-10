@@ -74,13 +74,15 @@ class GalleryViewModel @Inject constructor(
                     }
                 }
                 .map { mediaFiles ->
-                    mediaFiles.map { file ->
-                        GalleryItem(
-                            fileName = file.fileName,
-                            mediaType = file.mediaType,
-                            createdAtTimestampMillis = file.createdAtTimestampMillis
-                        )
-                    }
+                    mediaFiles
+                        .filter { file -> file.mediaType == MediaType.PHOTO }
+                        .map { photoFile ->
+                            GalleryItem(
+                                fileName = photoFile.fileName,
+                                mediaType = photoFile.mediaType,
+                                createdAtTimestampMillis = photoFile.createdAtTimestampMillis
+                            )
+                        }
                 }
                 .catch { exception ->
                     Log.e(Constants.APP_TAG, "Error loading gallery media", exception)
