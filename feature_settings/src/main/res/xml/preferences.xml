@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Appearance Category -->
     <PreferenceCategory
         app:key="category_appearance"
         app:title="@string/settings_category_appearance">
@@ -20,7 +19,6 @@
 
     </PreferenceCategory>
 
-    <!-- Security Category -->
     <PreferenceCategory
         app:key="category_security"
         app:title="@string/settings_category_security">
@@ -32,7 +30,6 @@
             app:summaryOff="@string/settings_summary_app_lock_off"
             app:defaultValue="false"/>
 
-        <!-- Lock Method - Enabled only if App Lock is ON -->
         <ListPreference
             app:key="@string/settings_key_lock_method"
             app:title="@string/settings_title_lock_method"
@@ -43,8 +40,6 @@
         app:useSimpleSummaryProvider="true"
         app:dependency="@string/settings_key_enable_app_lock"/>
 
-        <!-- Set/Change PIN - Enabled only if App Lock is ON and Method is PIN -->
-        <!-- Using a simple Preference which will trigger navigation/dialog in the fragment -->
         <Preference
             app:key="@string/settings_key_set_pin"
             app:title="@string/settings_title_set_pin"
@@ -75,7 +70,6 @@
 
     </PreferenceCategory>
 
-    <!-- About Category -->
     <PreferenceCategory
         app:key="category_about"
         app:title="@string/settings_category_about">

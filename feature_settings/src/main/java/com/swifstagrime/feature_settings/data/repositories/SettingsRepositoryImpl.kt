@@ -32,39 +32,34 @@ class SettingsRepositoryImpl @Inject constructor(
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
 
-    // Use callbackFlow to listen for SharedPreferences changes reactively
     private val preferenceChangesFlow = callbackFlow {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            key?.let { trySend(it).isSuccess } // Emit the key that changed
+            key?.let { trySend(it).isSuccess }
         }
         prefs.registerOnSharedPreferenceChangeListener(listener)
-        // Ensure initial values are emitted if needed by startingWith or similar downstream
         awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
-    }.shareIn( // Share the flow to avoid multiple listeners
-        scope = CoroutineScope(Dispatchers.IO), // Use an appropriate scope
+    }.shareIn(
+        scope = CoroutineScope(Dispatchers.IO),
         started = SharingStarted.WhileSubscribed(),
-        replay = 1 // Replay the last emission for new subscribers
+        replay = 1
     )
 
-    // --- App Theme ---
     override val appTheme: Flow<AppTheme> = preferenceChangesFlow
-        .filter { it == KEY_APP_THEME } // Trigger on specific key change or initial sub
-        .map { getCurrentTheme() } // Map to current value
-        .distinctUntilChanged() // Only emit if value actually changed
-        .onStart { emit(getCurrentTheme()) } // Emit initial value
+        .filter { it == KEY_APP_THEME }
+        .map { getCurrentTheme() }
+        .distinctUntilChanged()
+        .onStart { emit(getCurrentTheme()) }
 
     override suspend fun setAppTheme(theme: AppTheme) {
-        withContext(Dispatchers.IO) { // Perform disk write off main thread
+        withContext(Dispatchers.IO) {
             prefs.edit { putString(KEY_APP_THEME, theme.name) }
         }
     }
 
     private fun getCurrentTheme(): AppTheme {
-        // Read from prefs, default to SYSTEM_DEFAULT
         return AppTheme.valueOf(prefs.getString(KEY_APP_THEME, AppTheme.SYSTEM_DEFAULT.name) ?: AppTheme.SYSTEM_DEFAULT.name)
     }
 
-    // --- App Lock ---
     override val lockMethod: Flow<LockMethod> = preferenceChangesFlow
         .filter { it == KEY_LOCK_METHOD }
         .map { getCurrentLockMethod() }
@@ -83,7 +78,6 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     private fun getCurrentLockMethod(): LockMethod {
-        // Read from prefs, default to NONE
         return LockMethod.valueOf(prefs.getString(KEY_LOCK_METHOD, LockMethod.NONE.name) ?: LockMethod.NONE.name)
     }
 
@@ -92,6 +86,7 @@ class SettingsRepositoryImpl @Inject constructor(
         private const val PREFS_NAME = "secure_app_settings"
         private const val KEY_APP_THEME = "app_theme"
         private const val KEY_LOCK_METHOD = "lock_method"
-        // Add other keys as needed
     }
+
+
 }

@@ -76,10 +76,8 @@ class AuthActivity : AppCompatActivity() {
         val authMode = intent.getStringExtra(EXTRA_AUTH_MODE) ?: AUTH_MODE_VERIFY
 
         if (authMode == AUTH_MODE_SETUP_OR_CHANGE) {
-            // Tell ViewModel to start the setup flow directly
-            viewModel.startPinSetupFlow() // Add this function to AuthViewModel
+            viewModel.startPinSetupFlow()
         }
-        // If mode is VERIFY or null, ViewModel's init { checkInitialState() } will handle it
     }
 
     private fun setupBiometrics() {

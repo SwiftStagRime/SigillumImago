@@ -5,7 +5,7 @@ enum class AppTheme {
 }
 
 enum class LockMethod {
-    NONE, // App lock disabled
+    NONE,
     PIN,
     BIOMETRIC
 }
