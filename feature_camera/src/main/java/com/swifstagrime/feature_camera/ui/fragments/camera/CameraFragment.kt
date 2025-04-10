@@ -20,10 +20,12 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.util.concurrent.ListenableFuture
 import com.swifstagrime.core_common.constants.Constants
@@ -84,7 +86,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
         binding.captureButton.setOnClickListener { viewModel.onTakePhotoClicked() }
         binding.switchCameraButton.setOnClickListener { viewModel.onSwitchCameraClicked() }
         binding.flashButton.setOnClickListener { viewModel.onFlashButtonClicked() }
-        binding.galleryButton.setOnClickListener { showSnackbar("Gallery feature not yet implemented.") }
+        binding.galleryButton.setOnClickListener { navigateToGallery() }
 
         binding.previewView.setOnTouchListener { view, motionEvent ->
             when (motionEvent.action) {
@@ -103,6 +105,11 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
             }
         }
     }
+
+    private fun navigateToGallery() {
+        findNavController().navigate("sigillum://app/gallery".toUri())
+    }
+
 
     override fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {

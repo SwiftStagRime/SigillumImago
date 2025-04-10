@@ -67,5 +67,6 @@
     <fragment
         android:id="@+id/navigation_documents"
         android:name="com.swifstagrime.feature_documents.ui.fragments.documents.DocumentsFragment"
-        android:label="DocumentsFragment" />
+        android:label="DocumentsFragment"
+        tools:layout="@layout/fragment_documents"/>
 </navigation>
