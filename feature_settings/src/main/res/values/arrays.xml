@@ -1,3 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="theme_entries">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Follow System</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>LIGHT</item>
+        <item>DARK</item>
+        <item>SYSTEM_DEFAULT</item>
+    </string-array>
+
+    <string-array name="lock_method_entries">
+        <item>PIN</item>
+        <item>Biometrics (Fingerprint, Face, etc.)</item>
+    </string-array>
+    <string-array name="lock_method_values">
+        <item>PIN</item>
+        <item>BIOMETRIC</item>
+    </string-array>
 </resources>

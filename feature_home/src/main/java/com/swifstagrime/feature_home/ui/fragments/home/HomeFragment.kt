@@ -142,8 +142,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun navigateToSettings() {
-        //Not implemented yet!!!!!
-        //findNavController().navigate("sigillum://app/settings".toUri())
+        findNavController().navigate("sigillum://app/settings".toUri())
     }
 
     private fun navigateToCamera() {

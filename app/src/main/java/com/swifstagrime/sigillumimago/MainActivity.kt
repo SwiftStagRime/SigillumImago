@@ -37,7 +37,8 @@ class MainActivity : AppCompatActivity() {
             if (destination.id == R.id.navigation_camera ||
                 destination.id == R.id.navigation_photo ||
                 destination.id == R.id.navigation_recorder ||
-                destination.id == R.id.navigation_doc_upload
+                destination.id == R.id.navigation_doc_upload ||
+                destination.id == R.id.navigation_settings
             ) {
                 navView.visibility = View.GONE
             } else {

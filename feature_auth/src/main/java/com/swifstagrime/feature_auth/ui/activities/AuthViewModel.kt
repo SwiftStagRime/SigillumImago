@@ -263,5 +263,11 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-
+    fun startPinSetupFlow() {
+        // Directly set the state to start the PIN setup/change process
+        _pinValue.value = ""
+        _firstPinAttempt = null
+        _authState.value = AuthState.Setup_PromptPin
+        Log.i(Constants.APP_TAG, "Starting PIN setup/change flow via explicit request.")
+    }
 }

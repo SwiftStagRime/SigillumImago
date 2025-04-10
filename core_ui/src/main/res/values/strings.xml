@@ -89,11 +89,53 @@
     <string name="cd_delete_document_item">Delete this document</string>
 
     <string name="no_documents_found">No documents found.</string>
-    <string name="dialog_delete_message_doc">Are you sure you want to delete \n\"%1$s\"?</string> <!-- Specific message -->
+    <string name="dialog_delete_message_doc">Are you sure you want to delete \n\"%1$s\"?</string>
     <string name="error_no_app_found_to_open">No application found to open file type: %1$s</string>
     <string name="error_opening_file_permission">Permission denied opening file.</string>
     <string name="error_opening_file_provider">Error sharing file. Check app configuration.</string>
     <string name="error_creating_temp_file">Error preparing file for viewing.</string>
     <string name="document_details_format">%1$s | %2$s</string>
+
+    <string name="settings_key_app_theme" translatable="false">pref_app_theme</string>
+    <string name="settings_key_enable_app_lock" translatable="false">pref_enable_app_lock</string>
+    <string name="settings_key_lock_method" translatable="false">pref_lock_method</string>
+    <string name="settings_key_set_pin" translatable="false">pref_set_pin</string>
+    <string name="settings_key_storage_usage" translatable="false">pref_storage_usage</string>
+    <string name="settings_key_clear_data" translatable="false">pref_clear_data</string>
+    <string name="settings_key_version" translatable="false">pref_version</string>
+    <string name="settings_key_privacy_policy" translatable="false">pref_privacy_policy</string>
+    <string name="settings_key_licenses" translatable="false">pref_licenses</string>
+
+    <string name="settings_category_appearance">Appearance</string>
+    <string name="settings_category_security">Security</string>
+    <string name="settings_category_data_management">Data Management</string>
+    <string name="settings_category_about">About</string>
+
+    <string name="settings_title_app_theme">Theme</string>
+    <string name="settings_title_enable_app_lock">Enable App Lock</string>
+    <string name="settings_title_lock_method">Lock Method</string>
+    <string name="settings_title_set_pin">Set / Change PIN</string>
+    <string name="settings_title_storage_usage">Storage Used</string>
+    <string name="settings_title_clear_data">Clear All Secure Data</string>
+    <string name="settings_title_version">App Version</string>
+    <string name="settings_title_privacy_policy">Privacy Policy</string>
+    <string name="settings_title_licenses">Open Source Licenses</string>
+
+    <string name="settings_summary_app_lock_on">App will require unlock on launch</string>
+    <string name="settings_summary_app_lock_off">App is not locked</string>
+    <string name="settings_summary_set_pin">Configure your secure PIN</string>
+    <string name="settings_summary_storage_calculating">Calculating…</string>
+    <string name="settings_summary_clear_data">Permanently delete all photos, recordings, and documents stored securely within the app.</string>
+    <string name="settings_title_change_pin">Change PIN</string>
+
+    <string name="settings_summary_change_pin">Update your existing secure PIN</string>
+    <string name="settings_summary_set_pin_new">Create a secure PIN to protect your app</string>
+
+    <string name="dialog_clear_data_title">Clear All Data?</string>
+    <string name="dialog_clear_data_message">This will permanently delete ALL secure photos, recordings, and documents stored in this app. This action cannot be undone.\n\nAre you absolutely sure?</string>
+    <string name="clear">Clear</string>
+    <string name="clearing_data">Clearing data…</string>
+
+    <string name="privacy_policy_url" translatable="false">https://github.com/SwiftStagRime/SigillumImago</string>
 
 </resources>

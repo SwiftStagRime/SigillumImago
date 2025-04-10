@@ -283,7 +283,7 @@ class RecorderFragment : BaseFragment<FragmentRecorderBinding>() {
     }
 
     private fun showPermissionRationale() {
-        MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(requireContext(), com.swifstagrime.core_ui.R.style.AppTheme_Dialog_Rounded)
             .setTitle("Permission Required")
             .setMessage(R.string.recording_permission_rationale)
             .setNegativeButton(R.string.cancel) { _, _ ->

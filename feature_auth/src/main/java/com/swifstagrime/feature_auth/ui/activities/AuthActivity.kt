@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
@@ -28,8 +29,16 @@ class AuthActivity : AppCompatActivity() {
 
     private lateinit var pinDots: List<ImageView>
 
+    companion object {
+        const val EXTRA_AUTH_MODE = "auth_mode_extra"
+        const val AUTH_MODE_VERIFY = "verify"
+        const val AUTH_MODE_SETUP_OR_CHANGE = "setup_or_change"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -41,6 +50,7 @@ class AuthActivity : AppCompatActivity() {
             binding.pinDot5
         )
 
+        handleIntentExtras()
         setupPinPad()
         setupBiometrics()
         observeViewModel()
@@ -62,6 +72,15 @@ class AuthActivity : AppCompatActivity() {
         binding.buttonBiometric.setOnClickListener { viewModel.onBiometricAuthenticationRequested() }
     }
 
+    private fun handleIntentExtras() {
+        val authMode = intent.getStringExtra(EXTRA_AUTH_MODE) ?: AUTH_MODE_VERIFY
+
+        if (authMode == AUTH_MODE_SETUP_OR_CHANGE) {
+            // Tell ViewModel to start the setup flow directly
+            viewModel.startPinSetupFlow() // Add this function to AuthViewModel
+        }
+        // If mode is VERIFY or null, ViewModel's init { checkInitialState() } will handle it
+    }
 
     private fun setupBiometrics() {
         executor = ContextCompat.getMainExecutor(this)

@@ -123,7 +123,7 @@ class DocumentsFragment : BaseFragment<FragmentDocumentsBinding>() {
     }
 
     private fun showDeleteConfirmationDialog(internalFileName: String, displayName: String) {
-        MaterialAlertDialogBuilder(requireContext(), R.style.Theme_SigillumImago)
+        MaterialAlertDialogBuilder(requireContext(), com.swifstagrime.core_ui.R.style.AppTheme_Dialog_Rounded)
             .setTitle(R.string.dialog_delete_title)
             .setMessage(getString(R.string.dialog_delete_message_doc, displayName))
             .setNegativeButton(R.string.cancel, null)
